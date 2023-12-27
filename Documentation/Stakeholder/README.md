@@ -1,2 +1,2 @@
-Stakeholder 
-this directory has the Stakeholders diagram and Stakeholders file
+
+this directory has the Stakeholders diagram and Stakeholders text file
