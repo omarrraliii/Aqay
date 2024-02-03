@@ -1,7 +1,4 @@
 using Aqay_v2.Helpers;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration; // Add this namespace for IConfiguration
 using Microsoft.OpenApi.Models;
 using Aqay_v2.Context;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Aqay_v2.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Configuration;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,7 +34,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 var configuration = builder.Configuration;
 builder.Services.Configure<JWT>(configuration.GetSection("JWT"));
-var app = builder.Build();
 
 //Introduce a default schema Authentication
 builder.Services.AddAuthentication(options =>
@@ -62,6 +57,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

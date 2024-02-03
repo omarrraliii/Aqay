@@ -1,4 +1,4 @@
-namespace Aqay_v2.Helpers
+﻿namespace Aqay_v2.Helpers
 {
     public class JWT
     {

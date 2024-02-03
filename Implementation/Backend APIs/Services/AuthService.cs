@@ -1,4 +1,4 @@
-using Aqay_v2.Helpers;
+﻿using Aqay_v2.Helpers;
 using Aqay_v2.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -25,16 +25,24 @@ namespace Aqay_v2.Services
         }
         public async Task<AuthModel> SignupAsync(SignupModel model)
         {
-            //check if the user already exists
-            if(await _userManager.FindByEmailAsync(model.Email) is not null)
+            // Check if the user already exists
+            if (await _userManager.FindByNameAsync(model.Username) is not null)
             {
-                return new AuthModel { Message = " Email is already regiestered" };
+                return new AuthModel { Message = "Username is already registered" };
             }
-            if (await _userManager.FindByNameAsync (model.Username) is not null)
+
+            // Check if the email has reached the maximum number of allowed accounts (5)
+            var existingAccounts = await _userManager.FindByEmailAsync(model.Email);
+            if (existingAccounts != null)
             {
-                return new AuthModel { Message = " Username is already regiestered" };
+                var existingRoles = await _userManager.GetRolesAsync(existingAccounts);
+                if (existingRoles.Count >= 5)
+                {
+                    return new AuthModel { Message = "Maximum number of accounts reached for this email" };
+                }
             }
-            //create a new user to add in the database
+
+            // Create a new user to add to the database
             var user = new User
             {
                 UserName = model.Username,
@@ -42,19 +50,22 @@ namespace Aqay_v2.Services
                 Firstname = model.Firstname,
                 Lastname = model.Lastname
             };
-            //If there was any error return it as a message
+
+            // If there was any error, return it as a message
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
             {
                 string errors = string.Empty;
-                foreach(var error in result.Errors)
+                foreach (var error in result.Errors)
                 {
                     errors += $"{error.Description}\n";
                 }
                 return new AuthModel { Message = errors };
             }
-            //Create user as a buyer by default
+
+            // Create user as a buyer by default
             await _userManager.AddToRoleAsync(user, "Buyer");
+
             var jwtSecurityToken = await CreateJwtToken(user);
             return new AuthModel
             {
@@ -66,6 +77,79 @@ namespace Aqay_v2.Services
                 UserName = user.UserName
             };
         }
+
+        public async Task<AuthModel> LoginAsync(LoginModel model)
+        {
+            var authmodel = new AuthModel();
+            var user = await _userManager.FindByNameAsync(model.Username);
+            if (user is null)
+            {
+                authmodel.Message = "Email or Password is incorrect!\n";
+                return authmodel;
+            }
+
+            // Check if the user has exceeded the maximum allowed password attempts
+            var accessFailedCount = await _userManager.GetAccessFailedCountAsync(user);
+            if (accessFailedCount >= 3)
+            {
+                // Send a warning email to the user
+                SendWarningEmail(user.Email);
+                authmodel.Message = "You have exceeded the maximum allowed password attempts. An email has been sent to you for security purposes. Please watch out!\n";
+                return authmodel;
+            }
+
+            if (await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                authmodel.Message = "Password is incorrect. Please try again!\n";
+
+                // Increment access failed count since the password attempt was unsuccessful
+                await _userManager.AccessFailedAsync(user);
+
+                return authmodel;
+            }
+
+            // If the password is correct, reset access failed count
+            await _userManager.ResetAccessFailedCountAsync(user);
+            var jwtSecurityToken = await CreateJwtToken(user);
+            var rolesList = await _userManager.GetRolesAsync(user);
+            authmodel.IsAuthenticated = true;
+            authmodel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            authmodel.Email = user.Email;
+            authmodel.UserName = user.UserName;
+            authmodel.ExpiresOn = jwtSecurityToken.ValidTo;
+            authmodel.Roles = rolesList.ToList();
+            return authmodel;
+        }
+        public async Task<string> SupscripeAsync(SupscriptionModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user is null)
+            {
+                return "Invalid User Id\n";   
+            }
+            if(!await _roleManager.RoleExistsAsync(model.RoleName))
+            {
+                return "Invalid Role\n";
+            }
+            if(await _userManager.IsInRoleAsync(user, model.RoleName))
+            {
+                return $"User is already assigned to{model.RoleName}\n";
+            }
+            var result = await _userManager.AddToRoleAsync(user,model.RoleName);
+            if (result.Succeeded)
+            {
+                return "Done!\n";
+            }
+            else
+            {
+                return "Something went wrong and i don't know what it is\n figure it out on your own :(";
+            }
+        }
+        private void SendWarningEmail(string userEmail)
+        {
+            // to Implement the logic to send a warning email to the user 
+        }
+
         //Create a user token
         private async Task<JwtSecurityToken> CreateJwtToken(User user)
         {
