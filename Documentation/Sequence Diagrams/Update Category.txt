@@ -1,0 +1,54 @@
+@startuml
+actor User
+participant "Client" as Client
+participant "AuthController" as AuthController
+participant "AuthService" as AuthService
+participant "CategoryController" as CategoryController
+participant "CategoryService" as CategoryService
+participant "ApplicationDbContext" as ApplicationDbContext
+
+
+User -> Client: Request Update Category
+activate Client
+
+Client -> AuthController: Request Token
+activate AuthController
+
+AuthController -> AuthService: Validate Token
+activate AuthService
+AuthService --> AuthController: Token Validated
+deactivate AuthService
+
+AuthController -> CategoryController: PUT /api/Categories
+deactivate AuthController
+activate CategoryController
+CategoryController -> CategoryService: UpdateAsync(CategoryUpdateDto)
+activate CategoryService
+
+CategoryService -> ApplicationDbContext: ReadByName(model.Name)
+activate ApplicationDbContext
+ApplicationDbContext --> CategoryService: Category Retrieved
+deactivate ApplicationDbContext
+
+alt Category Found
+    CategoryService -> ApplicationDbContext: Update(Category)
+    activate ApplicationDbContext
+    ApplicationDbContext --> CategoryService: Success
+    deactivate ApplicationDbContext
+
+    CategoryService --> CategoryController: Category Updated
+    deactivate CategoryService
+    CategoryController -> Client: Response Category
+    deactivate CategoryController
+else Category Not Found
+    CategoryService -> CategoryController : Category not found
+    activate CategoryService
+    activate CategoryController
+    CategoryController -> Client : Category not found
+    deactivate CategoryService
+    deactivate CategoryController
+end
+
+deactivate CategoryController
+deactivate Client
+@enduml
