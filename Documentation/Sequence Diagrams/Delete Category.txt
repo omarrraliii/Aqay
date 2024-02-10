@@ -8,43 +8,46 @@ participant CategoryService as CategoryService
 participant ApplicationDbContext as ApplicationDbContext
 
 
-User - Client Request Delete Category
+User -> Client: Request Delete Category
 activate Client
 
-Client - AuthController Request Token
+Client -> AuthController: Request Token
 activate AuthController
 
-AuthController - AuthService Validate Token
+AuthController -> AuthService: Validate Token
 activate AuthService
-AuthService -- AuthController Token Validated
+AuthService --> AuthController: Token Validated
 deactivate AuthService
 
-AuthController - CategoryController DELETE apiCategories
+AuthController -> CategoryController: DELETE apiCategories
 deactivate AuthController
 activate CategoryController
 
-CategoryController - CategoryService DeleteAsync(Name)
+CategoryController -> CategoryService: DeleteAsync(Name)
 activate CategoryService
 
-CategoryService - ApplicationDbContext ReadByName(Name)
+CategoryService -> ApplicationDbContext: ReadByName(Name)
 activate ApplicationDbContext
-ApplicationDbContext -- CategoryService Category Retrieved
+ApplicationDbContext --> CategoryService: Category Retrieved
 deactivate ApplicationDbContext
 
 alt Category Found
-    CategoryService - ApplicationDbContext Delete(Category)
+    CategoryService -> ApplicationDbContext: Delete(Category)
     activate ApplicationDbContext
-    ApplicationDbContext -- CategoryService Success
+    ApplicationDbContext --> CategoryService: Success
     deactivate ApplicationDbContext
 
-    CategoryService -- CategoryController Deletion Done
+    CategoryService --> CategoryController: Deletion Done
     deactivate CategoryService
-    CategoryController - Client Response Deletion Done
+    CategoryController -> Client: Response Deletion Done
     deactivate CategoryController
 else Category Not Found
-    CategoryService - Client Error message
+    CategoryService -> CategoryController : Category not found
     activate CategoryService
+    activate CategoryController
+    CategoryController -> Client : Category not found
     deactivate CategoryService
+    deactivate CategoryController
 end
 
 
