@@ -1,0 +1,41 @@
+@startuml
+actor User
+participant "Client" as Client
+participant "AuthController" as AuthController
+participant "AuthService" as AuthService
+participant "CategoryController" as CategoryController
+participant "CategoryService" as CategoryService
+participant "ApplicationDbContext" as ApplicationDbContext
+
+
+User -> Client: Request Create Category
+activate Client
+
+Client -> AuthController: Request Token
+activate AuthController
+
+AuthController -> AuthService: Validate Token
+activate AuthService
+AuthService --> AuthController: Token Validated
+deactivate AuthService
+
+AuthController -> CategoryController: POST /api/Categories
+deactivate AuthController
+activate CategoryController
+
+CategoryController -> CategoryService: CreateAsync(Category)
+activate CategoryService
+
+CategoryService -> ApplicationDbContext: AddAsync(Category)
+activate ApplicationDbContext
+ApplicationDbContext --> CategoryService: Success
+deactivate ApplicationDbContext
+
+CategoryService --> CategoryController: Category Created
+deactivate CategoryService
+
+CategoryController -> Client: Response Category
+deactivate CategoryController
+
+deactivate Client
+@enduml
