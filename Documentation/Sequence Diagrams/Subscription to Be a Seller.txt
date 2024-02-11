@@ -3,7 +3,7 @@ actor User
 participant "Client" as Client
 participant "AuthController" as AuthController
 participant "AuthService" as AuthService
-participant "UserManager" as UserManager
+participant "ASP.NETUserIdentity" as ASP.NETUserIdentity
 
 User -> Client: Request Subscription to Be a Seller
 activate Client
@@ -14,26 +14,26 @@ activate AuthController
 AuthController -> AuthService: SupscripeAsync(SupscriptionModel)
 activate AuthService
 
-AuthService -> UserManager: FindByIdAsync
-activate UserManager
-UserManager --> AuthService: User
-deactivate UserManager
+AuthService -> ASP.NETUserIdentity: FindByIdAsync
+activate ASP.NETUserIdentity
+ASP.NETUserIdentity --> AuthService: User
+deactivate ASP.NETUserIdentity
 
 alt User Found
-    AuthService -> UserManager: RoleExistsAsync
-    activate UserManager
-    UserManager --> AuthService: RoleExists
-    deactivate UserManager
+    AuthService -> ASP.NETUserIdentity: RoleExistsAsync
+    activate ASP.NETUserIdentity
+    ASP.NETUserIdentity --> AuthService: RoleExists
+    deactivate ASP.NETUserIdentity
 
-    AuthService -> UserManager: IsInRoleAsync
-    activate UserManager
-    UserManager --> AuthService: IsInRole
-    deactivate UserManager
+    AuthService -> ASP.NETUserIdentity: IsInRoleAsync
+    activate ASP.NETUserIdentity
+    ASP.NETUserIdentity --> AuthService: IsInRole
+    deactivate ASP.NETUserIdentity
 
-    AuthService -> UserManager: AddToRoleAsync
-    activate UserManager
-    UserManager --> AuthService: Result
-    deactivate UserManager
+    AuthService -> ASP.NETUserIdentity: AddToRoleAsync
+    activate ASP.NETUserIdentity
+    ASP.NETUserIdentity --> AuthService: Result
+    deactivate ASP.NETUserIdentity
 
     AuthService -> AuthService: CreateJwtToken(User)
     activate AuthService
