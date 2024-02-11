@@ -1,0 +1,55 @@
+@startuml
+actor User
+participant "Client" as Client
+participant "AuthController" as AuthController
+participant "AuthService" as AuthService
+participant "UserManager" as UserManager
+
+User -> Client: Request Subscription to Be a Seller
+activate Client
+
+Client -> AuthController: POST /api/Auth/Subscribe
+activate AuthController
+
+AuthController -> AuthService: SupscripeAsync(SupscriptionModel)
+activate AuthService
+
+AuthService -> UserManager: FindByIdAsync
+activate UserManager
+UserManager --> AuthService: User
+deactivate UserManager
+
+alt User Found
+    AuthService -> UserManager: RoleExistsAsync
+    activate UserManager
+    UserManager --> AuthService: RoleExists
+    deactivate UserManager
+
+    AuthService -> UserManager: IsInRoleAsync
+    activate UserManager
+    UserManager --> AuthService: IsInRole
+    deactivate UserManager
+
+    AuthService -> UserManager: AddToRoleAsync
+    activate UserManager
+    UserManager --> AuthService: Result
+    deactivate UserManager
+
+    AuthService -> AuthService: CreateJwtToken(User)
+    activate AuthService
+    AuthService --> AuthController: JWT Token
+    deactivate AuthService
+
+    AuthController --> Client: Success message
+    deactivate AuthController
+else User Not Found or Role Invalid
+    AuthService --> AuthController : User Not Found or Role Invalid
+    activate AuthController
+    AuthController --> Client : User Not Found or Role Invalid
+    deactivate AuthService
+    deactivate AuthController
+end
+
+deactivate AuthService
+deactivate Client
+@enduml
