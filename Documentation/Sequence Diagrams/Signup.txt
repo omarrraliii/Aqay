@@ -1,0 +1,44 @@
+@startuml
+actor User
+participant "Client" as Client
+participant "AuthController" as AuthController
+participant "AuthService" as AuthService
+participant "ASP.NETUserIdentity" as ASP.NETUserIdentity
+
+User -> Client: Request Signup
+activate Client
+
+Client -> AuthController: POST /api/Auth/Signup
+activate AuthController
+
+AuthController -> AuthService: SignupAsync(SignupModel)
+activate AuthService
+
+AuthService -> ASP.NETUserIdentity: FindByNameAsync
+activate ASP.NETUserIdentity
+ASP.NETUserIdentity --> AuthService: User
+deactivate ASP.NETUserIdentity
+
+alt User Already Exists
+    AuthService --> AuthController: Error User Already Exist
+    deactivate AuthController
+    deactivate AuthService
+else User Not Found
+
+    AuthService -> ASP.NETUserIdentity: GetRolesAsync
+    activate AuthService
+    activate AuthController
+    activate ASP.NETUserIdentity
+    ASP.NETUserIdentity --> AuthService: Roles
+    deactivate ASP.NETUserIdentity
+    AuthService -> AuthService: CreateJwtToken(User)
+    AuthService --> AuthController: JWT Token
+    deactivate AuthService
+
+    AuthController --> Client: AuthModel
+    deactivate AuthController
+end
+
+deactivate AuthService
+deactivate Client
+@enduml
