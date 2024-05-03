@@ -1,7 +1,3 @@
-Sure, here's the content converted into Markdown format with the necessary instructions:
-
----
-
 ## Setting Up and Running the Project Locally
 
 To run the project locally, follow these steps:
