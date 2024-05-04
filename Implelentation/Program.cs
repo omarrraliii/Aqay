@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using aqay_apis.Context;
 using aqay_apis.Models;
+using aqay_apis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,8 @@ builder.Services.AddIdentity<User, IdentityRole>()
 // Introduce Auth Service 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Introduce MailingService
+builder.Services.AddTransient<IMailingService,MailingService>();
 // Add controllers and endpoints
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -41,6 +44,9 @@ builder.Services.AddCors(options =>
                .AllowAnyOrigin();
     });
 });
+
+// Configure MailService
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 // Configure JWT authentication
 var configuration = builder.Configuration;
