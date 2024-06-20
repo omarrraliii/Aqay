@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿namespace aqay_apis.Models
 {
     public class Brand
@@ -21,3 +22,17 @@
 
     }
 }
+=======
+﻿namespace aqay_apis.Models
+{
+    public class Brand
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        // one-to-one relationship
+        public string BrandOwnerId { get; set; }
+        public Merchant BrandOwner { get; set; } //navigation property
+    }
+}
+>>>>>>> 7076cfbc8c682a2ab0ed0420e7542082677ac640

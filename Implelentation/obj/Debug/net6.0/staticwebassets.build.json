@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "Version": 1,
   "Hash": "FDKp0u4edpH42aW+Xzpr10TmBnFTV8q7QJuubL+lFHQ=",
@@ -8,4 +9,16 @@
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
   "Assets": []
+=======
+{
+  "Version": 1,
+  "Hash": "FDKp0u4edpH42aW+Xzpr10TmBnFTV8q7QJuubL+lFHQ=",
+  "Source": "aqay_apis",
+  "BasePath": "_content/aqay_apis",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+>>>>>>> 7076cfbc8c682a2ab0ed0420e7542082677ac640
 }
