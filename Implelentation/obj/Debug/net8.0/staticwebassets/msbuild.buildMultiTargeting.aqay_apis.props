@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\aqay_apis.props" />
+</Project>
