@@ -6,5 +6,5 @@ public class Plan
     public string Name { get; set; }
     public string Describtion { get; set; }
     public double Price { get; set; }
-    
+    public Subscription Subscription { get; set; }
 }

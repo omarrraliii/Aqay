@@ -13,11 +13,5 @@ namespace aqay_apis.Models
         public string PasswordConfirm { get; set; }
         [Required]
         public bool Gender { get; set; }
-        [Required]
-        public int Day { get; set; }
-        [Required]
-        public int Month { get; set; }
-        [Required]
-        public int Year { get; set; }
     }
 }

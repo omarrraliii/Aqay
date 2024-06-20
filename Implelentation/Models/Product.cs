@@ -1,4 +1,5 @@
-﻿using aqay_apis.Models;
+﻿using System.Collections;
+using aqay_apis.Models;
 
 namespace aqay_apis;
 
@@ -16,13 +17,15 @@ public class Product
     public int GREEN { get; set; }
     public int Quantity { get; set; }
     //many to many relationship with Tags
-    public List<Tag> Tags{ get; set; }
+    public ICollection<Tag> Tags{ get; set; }
     //one to many relationship with Category
     public int CategoryId { get; set; }
     public Category Category { get; set; }
     //one to many relationship with Review
-    public List<Review> Reviews{ get; set; }
+    public ICollection<Review> Reviews{ get; set; }
     //Many to one relationship with Brand
     public int BrandId { get; set; }
     public Brand Brand { get; set; }
+    public ICollection<ShoppingCart> ShoppingCarts { get; set;}
+    public ICollection<WishList> WishLists { get; set;}
 }

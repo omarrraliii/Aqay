@@ -26,6 +26,21 @@ namespace aqay_apis.Context
             builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
             builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
             builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+            builder.Entity<Consumer>()
+                .HasOne(c => c.Review)
+                .WithOne(r => r.Consumer)
+                .HasForeignKey<Review>(r => r.ConsumerId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Consumer>()
+                .HasOne(s=>s.ShoppingCart)
+                .WithOne(s => s.Consumer)
+                .HasForeignKey<ShoppingCart>(s=>s.ConsumerId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Consumer>()
+                .HasOne(c => c.WishList)
+                .WithOne(w => w.Consumer)
+                .HasForeignKey<Consumer>(w => w.WishListId)
+                .OnDelete(DeleteBehavior.Restrict);    
 
         }
         public DbSet<Wallet> Wallets { get; set; }
@@ -38,6 +53,11 @@ namespace aqay_apis.Context
         public DbSet<PromoCode> PromoCodes { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Plan> Plans { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<WishList> WishLists { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<FAQ> FAQs { get; set; }
+        public DbSet<Report> Reports { get; set; }
     }
 
 }

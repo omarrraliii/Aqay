@@ -75,9 +75,6 @@ namespace aqay_apis.Services
                 Email = model.Email,
                 UserName = userName,
                 Gender = model.Gender,
-                Day = model.Day,
-                Month = model.Month,
-                Year = model.Year,
             };
             // register the new consumer in the db
             var result = await  _userManager.CreateAsync(consumer, model.Password);

@@ -7,4 +7,6 @@ public class About
     public int Id { get; set; }
     public string Info { get; set; }
     public string Creator { get; set; }
+    // one to one
+    public Brand Brand { get; set; }
 }
