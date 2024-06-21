@@ -27,5 +27,8 @@ public class Product
     public int BrandId { get; set; }
     public Brand Brand { get; set; }
     public ICollection<ShoppingCart> ShoppingCarts { get; set;}
-    public ICollection<WishList> WishLists { get; set;}
+    public ICollection<WishList> WishLists { get; set; }
+
+    // property to store the image URL
+    public string ImageUrl { get; set; }
 }
