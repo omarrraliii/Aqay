@@ -29,6 +29,11 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Introduce MailingService
 builder.Services.AddTransient<IMailingService,MailingService>();
+
+// Introduce systems services
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+
+
 // Add controllers and endpoints
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
