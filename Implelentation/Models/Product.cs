@@ -9,7 +9,7 @@ public class Product
     public string Name { get; set; }
     public double Price { get; set; }
     public string Size  { get; set; }
-    public string Describtion { get; set; }
+    public string Description { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime LastEdit { get; set; }
     public int RED { get; set; }
