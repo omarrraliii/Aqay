@@ -3,6 +3,7 @@ using aqay_apis.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace aqay_apis.Context
 {
@@ -26,6 +27,11 @@ namespace aqay_apis.Context
             builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
             builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
             builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+
+
+
+
+
             builder.Entity<Consumer>()
                 .HasOne(c => c.Review)
                 .WithOne(r => r.Consumer)
@@ -40,7 +46,24 @@ namespace aqay_apis.Context
                 .HasOne(c => c.WishList)
                 .WithOne(w => w.Consumer)
                 .HasForeignKey<Consumer>(w => w.WishListId)
-                .OnDelete(DeleteBehavior.Restrict);    
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            builder.Entity<Plan>().HasData(
+               new Plan { Id = 1, Name = "Monthly", Describtion = "Monthly subscription", Price = 9.99 },
+               new Plan { Id = 2, Name = "Quarterly", Describtion = "Quarterly subscription", Price = 27.99 },
+               new Plan { Id = 3, Name = "Yearly", Describtion = "Yearly subscription", Price = 99.99 }
+           );
+
+            builder.Entity<Subscription>().HasData(
+            new Subscription
+            {
+                Id = 1,
+                StartDate = new DateTime(2024, 1, 1),
+                EndDate = new DateTime(2024, 1, 1),
+                PlanId = 1
+            }
+        );
 
         }
         public DbSet<Wallet> Wallets { get; set; }
@@ -58,6 +81,9 @@ namespace aqay_apis.Context
         public DbSet<Order> Orders { get; set; }
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Report> Reports { get; set; }
+        ////////////////// FOR TESTING 
+        public DbSet<Merchant> Merchants { get; set; }
+        public DbSet<Consumer> Consumers { get; set; }
     }
 
 }

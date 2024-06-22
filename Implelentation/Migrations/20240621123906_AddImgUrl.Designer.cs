@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using aqay_apis.Context;
 
@@ -11,9 +12,11 @@ using aqay_apis.Context;
 namespace aqay_apis.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240621123906_AddImgUrl")]
+    partial class AddImgUrl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -474,29 +477,6 @@ namespace aqay_apis.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Plans");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Describtion = "Monthly subscription",
-                            Name = "Monthly",
-                            Price = 9.9900000000000002
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Describtion = "Quarterly subscription",
-                            Name = "Quarterly",
-                            Price = 27.989999999999998
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Describtion = "Yearly subscription",
-                            Name = "Yearly",
-                            Price = 99.989999999999995
-                        });
                 });
 
             modelBuilder.Entity("aqay_apis.Product", b =>
@@ -712,15 +692,6 @@ namespace aqay_apis.Migrations
                         .IsUnique();
 
                     b.ToTable("Subscriptions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EndDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PlanId = 1,
-                            StartDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
-                        });
                 });
 
             modelBuilder.Entity("aqay_apis.Tag", b =>
@@ -1099,7 +1070,8 @@ namespace aqay_apis.Migrations
 
             modelBuilder.Entity("aqay_apis.Models.Merchant", b =>
                 {
-                    b.Navigation("Brand");
+                    b.Navigation("Brand")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
