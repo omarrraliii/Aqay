@@ -1,4 +1,6 @@
-﻿namespace aqay_apis.Models
+﻿using aqay_apis.Models;
+
+namespace aqay_apis.Models
 {
     public class Merchant : User
     {
