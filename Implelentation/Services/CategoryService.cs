@@ -24,7 +24,11 @@ namespace aqay_apis.Services
         // Read Category by it's ID
         public async Task<Category> getCategoryById(int id)
         {
-            return await _context.Categories.FindAsync(id);
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null) {
+                throw new Exception("Category not found.");
+            }
+            return category;
         }
         // Read Category by it's name
         public async Task<Category> getCategoryByName(string name)
