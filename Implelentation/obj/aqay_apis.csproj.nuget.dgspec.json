@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj": {}
+    "f:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj": {}
   },
   "projects": {
-    "F:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj": {
+    "f:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj",
+        "projectUniqueName": "f:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj",
         "projectName": "aqay_apis",
-        "projectPath": "F:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj",
+        "projectPath": "f:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj",
         "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-        "outputPath": "F:\\Aqay project\\Aqay\\Implelentation\\obj\\",
+        "outputPath": "f:\\Aqay project\\Aqay\\Implelentation\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config"

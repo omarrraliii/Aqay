@@ -18,6 +18,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString)
 );
+// Introduce global variable service
+builder.Services.AddSingleton<GlobalVariables>();
 
 // Introduce Identity User for custom user management
 builder.Services.AddIdentity<User, IdentityRole>()
@@ -33,7 +35,7 @@ builder.Services.AddTransient<IMailingService,MailingService>();
 // Introduce systems services
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-
+builder.Services.AddScoped<IReportService, ReportService>();
 
 // Add controllers and endpoints
 builder.Services.AddControllers();
@@ -80,6 +82,10 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
+
+//intialize global variables
+var GlobalVariableService =app.Services.GetRequiredService<GlobalVariables>();
+GlobalVariableService.PageSize=10;
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
