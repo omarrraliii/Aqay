@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("aqay_apis")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9ae490784819681be5f77c0b2d96980955a3daa6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c7e7e10f039b4904ba19f6267cf1bdc7e3c8b495")]
 [assembly: System.Reflection.AssemblyProductAttribute("aqay_apis")]
 [assembly: System.Reflection.AssemblyTitleAttribute("aqay_apis")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -69,7 +69,7 @@ public class ReportService:IReportService
             reports= await _context.Reports
                                 .Skip((pageIndex-1)*_globalVariables.PageSize)
                                 .Take(_globalVariables.PageSize)
-                                .Where(r=>r.REPORTSTATUS==REPORTSTATUSES.OPEN)
+                                .Where(r=>r.REPORTSTATUS==REPORTSTATUSES.CLOSED)
                                 .ToListAsync();
         }
         return reports;
@@ -88,6 +88,7 @@ public class ReportService:IReportService
         var report= await _context.Reports.FindAsync(id);
         report.Action = action;
         report.REPORTSTATUS = REPORTSTATUS;
+        report.LastEdit= DateTime.Now;
         await _context.SaveChangesAsync();
         return report;
     }
