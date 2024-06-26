@@ -78,8 +78,13 @@ public class ReportService:IReportService
     public async Task<Report> OpenReportAsync(int id, string reviewerId)
     {
         var report = await _context.Reports.FindAsync(id);
-        report.ReviewerId = reviewerId;
-        await _context.SaveChangesAsync();
+        if (report.ReviewerId == null)
+        {
+            report.ReviewerId = reviewerId;
+            await _context.SaveChangesAsync();
+            return report;
+        }
+        
         return report;
     }
 
