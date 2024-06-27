@@ -30,7 +30,7 @@ builder.Services.AddIdentity<User, IdentityRole>()
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Introduce MailingService
-builder.Services.AddTransient<IMailingService,MailingService>();
+builder.Services.AddTransient<IMailingService, MailingService>();
 
 // Introduce systems services
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
@@ -38,6 +38,10 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IWishListService,WishListService>();
 
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+
+// Introduce Azure img Service 
+builder.Services.AddSingleton<IAzureBlobService, AzureBlobService>();
 
 // Add controllers and endpoints
 builder.Services.AddControllers();
