@@ -30,6 +30,7 @@ public class ReportService:IReportService
     public async Task<ICollection<Report>> GetReportsAsync(int pageIndex)
     {
         return await _context.Reports
+                              .OrderByDescending(r=>r.CreatedOn)
                               .Skip((pageIndex - 1) * _globalVariables.PageSize)
                               .Take(_globalVariables.PageSize)
                               .ToListAsync();
