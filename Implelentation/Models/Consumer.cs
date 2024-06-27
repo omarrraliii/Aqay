@@ -13,6 +13,6 @@
         public Review Review{ get; set; }
         public ShoppingCart ShoppingCart { get; set; }
         public WishList WishList { get; set; }
-        public int WishListId { get; set; } 
+        public int? WishListId { get; set; } 
     }
 }
