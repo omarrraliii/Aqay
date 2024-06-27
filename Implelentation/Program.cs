@@ -37,6 +37,7 @@ builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IWishListService,WishListService>();
 
+builder.Services.AddScoped<IReportService, ReportService>();
 
 // Add controllers and endpoints
 builder.Services.AddControllers();

@@ -11,7 +11,7 @@ namespace aqay_apis.controllers
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
-
+ 
         public CategoriesController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
