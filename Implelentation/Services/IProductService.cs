@@ -1,17 +1,17 @@
 ﻿using aqay_apis.Dtos;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace aqay_apis.Services
 {
     public interface IProductService
     {
-        Task<IEnumerable<Product>> GetAllProductsAsync(int pageNumber, int pageSize);
-        Task<Product> GetProductByIdAsync(int id);
-        Task<bool> CreateProductAsync(ProductCreateDto productCreateDto);
-        Task<bool> UpdateProductAsync(int id, ProductUpdateDto productUpdateDto);
-        Task<bool> DeleteProductAsync(int id);
-        Task<IEnumerable<Product>> GetProductsByCategoryNameAsync(string categoryName);
-        Task<IEnumerable<Product>> GetProductsByBrandIdAsync(int brandId);
+        Task<IEnumerable<Product>> GetAllAsync(int pageSize, int pageNumber);
+        Task<Product> GetByIdAsync(int id);
+        Task<Product> AddAsync(ProductDto productDto);
+        Task<Product> UpdateAsync(int id, ProductDto productDto);
+        Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<ProductVariant>> GetProductSpecsAsync(int productId);
+        Task<IEnumerable<ProductDto>> GetProductsByBrandAsync(int brandId, int pageSize, int pageNumber);
+        Task<IEnumerable<ProductDto>> GetProductsByCategoryAsync(int categoryId, int pageSize, int pageNumber);
+
     }
 }

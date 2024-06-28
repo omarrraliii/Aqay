@@ -1,5 +1,6 @@
 ﻿using aqay_apis.Context;
 using aqay_apis.Dtos;
+using aqay_apis.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,134 +12,196 @@ namespace aqay_apis.Services
     public class ProductService : IProductService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IAzureBlobService _azureBlobService;
         private readonly ICategoryService _categoryService;
+        //private readonly IBrandService _brandService;
+        private readonly IAzureBlobService _azureBlobService;
 
-        public ProductService(ApplicationDbContext context, IAzureBlobService azureBlobService, ICategoryService categoryService)
+        public ProductService(ApplicationDbContext context, ICategoryService categoryService, IAzureBlobService azureBlobService)
         {
             _context = context;
-            _azureBlobService = azureBlobService;
             _categoryService = categoryService;
+           // _brandService = brandService;
+            _azureBlobService = azureBlobService;
         }
-
-        public async Task<IEnumerable<Product>> GetAllProductsAsync(int pageNumber, int pageSize)
+        public async Task<IEnumerable<Product>> GetAllAsync(int pageSize, int pageNumber)
         {
             return await _context.Products
                 .OrderByDescending(p => p.LastEdit)
-                .Skip((pageNumber - 1) * pageSize)
+                .Skip(pageSize * (pageNumber - 1))
                 .Take(pageSize)
                 .ToListAsync();
         }
-
-        public async Task<Product> GetProductByIdAsync(int id)
+        public async Task<Product> GetByIdAsync(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products
+                .Include(p => p.ProductVariants)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             if (product == null)
             {
                 throw new Exception("Product not found.");
             }
             return product;
         }
+        public async Task<Product> AddAsync(ProductDto productDto)
+        {
+            ValidateProductDto(productDto);
 
-        public async Task<bool> UpdateProductAsync(int id, ProductUpdateDto productUpdateDto)
+            var category = await _categoryService.getCategoryById(productDto.CategoryId);
+            if (category == null)
+            {
+                throw new Exception("Category not found.");
+            }
+
+            if (!productDto.ProductVariants.Any())
+            {
+                productDto.ProductVariants.Add(new ProductVariantDto
+                {
+                    Size = "Default",
+                    Color = "Default",
+                    Quantity = 0,
+                    ImgFile = null
+                });
+            }
+            var product = new Product
+            {
+                Name = productDto.Name,
+                Price = productDto.Price,
+                Description = productDto.Description,
+                CreatedOn = DateTime.UtcNow,
+                LastEdit = DateTime.UtcNow,
+                CategoryId = productDto.CategoryId,
+                BrandId = productDto.BrandId,
+                ProductVariants = await Task.WhenAll(productDto.ProductVariants.Select(async v => new ProductVariant
+                {
+                    Size = v.Size,
+                    Color = v.Color,
+                    Quantity = v.Quantity,
+                    ImageUrl = v.ImgFile != null ? await _azureBlobService.UploadAsync(v.ImgFile) : "default-image-url"
+                }).ToList())
+            };
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
+            return product;
+        }
+        public async Task<Product> UpdateAsync(int id, ProductDto productDto)
+        {
+            var product = await _context.Products.Include(p => p.ProductVariants).FirstOrDefaultAsync(p => p.Id == id);
+            if (product == null)
+            {
+                throw new Exception("Product not found.");
+            }
+            ValidateProductDto(productDto, false);
+            product.Name = productDto.Name ?? product.Name;
+            product.Price = productDto.Price >= 0 ? productDto.Price : product.Price;
+            product.Description = productDto.Description ?? product.Description;
+            product.LastEdit = DateTime.UtcNow;
+            product.CategoryId = productDto.CategoryId > 0 ? productDto.CategoryId : product.CategoryId;
+            product.BrandId = productDto.BrandId > 0 ? productDto.BrandId : product.BrandId;
+            if (productDto.ProductVariants != null && productDto.ProductVariants.Any())
+            {
+                product.ProductVariants = await Task.WhenAll(productDto.ProductVariants.Select(async v => new ProductVariant
+                {
+                    Size = v.Size,
+                    Color = v.Color,
+                    Quantity = v.Quantity,
+                    ImageUrl = await _azureBlobService.UploadAsync(v.ImgFile)
+                }).ToList());
+            }
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+            return product;
+        }
+        public async Task<bool> DeleteAsync(int id)
         {
             var product = await _context.Products.FindAsync(id);
             if (product == null)
             {
                 return false;
             }
-
-            // Delete old image if exists
-            if (!string.IsNullOrEmpty(product.ImageUrl))
-            {
-                var uri = new Uri(product.ImageUrl);
-                var blobName = uri.Segments.Last();
-                await _azureBlobService.DeleteAsync(blobName);
-            }
-
-            // Upload new image
-            var imageUrl = await _azureBlobService.UploadAsync(productUpdateDto.ImgFile);
-
-            product.Name = productUpdateDto.Name;
-            product.Price = productUpdateDto.Price;
-            product.Size = productUpdateDto.Size;
-            product.Description = productUpdateDto.Description;
-            product.LastEdit = DateTime.UtcNow;
-            product.RED = productUpdateDto.RED;
-            product.BLUE = productUpdateDto.BLUE;
-            product.GREEN = productUpdateDto.GREEN;
-            product.Quantity = productUpdateDto.Quantity;
-            product.ImageUrl = imageUrl;
-
-            var category = await _categoryService.getCategoryByName(productUpdateDto.CategoryName);
-            product.CategoryId = category.Id;
-
-            _context.Products.Update(product);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> CreateProductAsync(ProductCreateDto productCreateDto)
-        {
-            var imageUrl = await _azureBlobService.UploadAsync(productCreateDto.ImageFile);
-
-            var category = await _categoryService.getCategoryByName(productCreateDto.CategoryName);
-            var product = new Product
-            {
-                Name = productCreateDto.Name,
-                Price = productCreateDto.Price,
-                Size = productCreateDto.Size,
-                Description = productCreateDto.Description,
-                CreatedOn = DateTime.UtcNow,
-                LastEdit = DateTime.UtcNow,
-                RED = productCreateDto.RED,
-                BLUE = productCreateDto.BLUE,
-                GREEN = productCreateDto.GREEN,
-                Quantity = productCreateDto.Quantity,
-                CategoryId = category.Id,
-                BrandId = productCreateDto.BrandId,
-                ImageUrl = imageUrl
-            };
-
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> DeleteProductAsync(int id)
-        {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null) return false;
-
-            // Delete image if exists
-            if (!string.IsNullOrEmpty(product.ImageUrl))
-            {
-                var uri = new Uri(product.ImageUrl);
-                var blobName = uri.Segments.Last();
-                await _azureBlobService.DeleteAsync(blobName);
-            }
-
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
             return true;
         }
-
-
-        // New method to get all products within one category by name
-        public async Task<IEnumerable<Product>> GetProductsByCategoryNameAsync(string categoryName)
+        public async Task<IEnumerable<ProductVariant>> GetProductSpecsAsync(int productId)
         {
-            var category = await _categoryService.getCategoryByName(categoryName);
-            return await _context.Products
-                .Where(p => p.CategoryId == category.Id)
-                .ToListAsync();
-        }
+            var product = await _context.Products
+                .Include(p => p.ProductVariants)
+                .FirstOrDefaultAsync(p => p.Id == productId);
 
-        // New method to get all products within one brand by ID
-        public async Task<IEnumerable<Product>> GetProductsByBrandIdAsync(int brandId)
+            if (product == null)
+            {
+                throw new Exception("Product not found.");
+            }
+            return product.ProductVariants;
+        }
+        public async Task<IEnumerable<ProductDto>> GetProductsByBrandAsync(int brandId, int pageSize, int pageNumber)
         {
             return await _context.Products
                 .Where(p => p.BrandId == brandId)
+                .OrderByDescending(p => p.LastEdit)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .Select(p => new ProductDto
+                {
+                    Name = p.Name,
+                    Price = p.Price,
+                    Description = p.Description
+                })
                 .ToListAsync();
+        }
+        public async Task<IEnumerable<ProductDto>> GetProductsByCategoryAsync(int categoryId, int pageSize, int pageNumber)
+        {
+            return await _context.Products
+                .Where(p => p.CategoryId == categoryId)
+                .OrderByDescending(p => p.LastEdit)
+                .Skip(pageSize * (pageNumber - 1))
+                .Take(pageSize)
+                .Select(p => new ProductDto
+                {
+                    Name = p.Name,
+                    Price = p.Price,
+                    Description = p.Description
+                })
+                .ToListAsync();
+        }
+        private void ValidateProductDto(ProductDto productDto, bool isNew = true)
+        {
+            if (isNew || (!isNew && !string.IsNullOrEmpty(productDto.Name)))
+            {
+                if (string.IsNullOrEmpty(productDto.Name))
+                {
+                    throw new ArgumentException("Name cannot be null or empty.");
+                }
+            }
+            if (isNew || (!isNew && productDto.Price >= 0))
+            {
+                if (productDto.Price < 0)
+                {
+                    throw new ArgumentException("Price cannot be negative.");
+                }
+            }
+            if (isNew || (!isNew && !string.IsNullOrEmpty(productDto.Description)))
+            {
+                if (string.IsNullOrEmpty(productDto.Description))
+                {
+                    throw new ArgumentException("Description cannot be null or empty.");
+                }
+            }
+            if (isNew || (!isNew && productDto.CategoryId > 0))
+            {
+                if (productDto.CategoryId <= 0)
+                {
+                    throw new ArgumentException("Invalid CategoryId.");
+                }
+            }
+            if (isNew || (!isNew && productDto.BrandId > 0))
+            {
+                if (productDto.BrandId <= 0)
+                {
+                    throw new ArgumentException("Invalid BrandId.");
+                }
+            }
         }
     }
 }

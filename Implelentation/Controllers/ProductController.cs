@@ -1,70 +1,170 @@
-﻿using aqay_apis.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using aqay_apis.Dtos;
+using aqay_apis.Models;
 using aqay_apis.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using aqay_apis.Context;
 
 namespace aqay_apis.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase
+    public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
-
-        public ProductController(IProductService productService)
+        private readonly IAzureBlobService _azureBlobService;
+        private readonly ApplicationDbContext _context;
+        public ProductsController(IProductService productService, IAzureBlobService azureBlobService , ApplicationDbContext context)
         {
             _productService = productService;
+            _azureBlobService = azureBlobService;
+            _context = context;
         }
-
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts(int pageNumber = 1, int pageSize = 10)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(int pageSize = 10, int pageNumber = 1)
         {
-            var products = await _productService.GetAllProductsAsync(pageNumber, pageSize);
+            var products = await _productService.GetAllAsync(pageSize, pageNumber);
             return Ok(products);
         }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetProductById(int id)
+        [HttpGet("id/")]
+        public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _productService.GetProductByIdAsync(id);
+            var product = await _productService.GetByIdAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
             return Ok(product);
         }
-
         [HttpPost]
-        public async Task<IActionResult> CreateProduct([FromForm] ProductCreateDto productCreateDto)
+        public async Task<ActionResult<Product>> AddProduct([FromForm] ProductDto productDto)
         {
-            var product = await _productService.CreateProductAsync(productCreateDto);
-            return Ok();
+            try
+            {
+                var product = await _productService.AddAsync(productDto);
+                return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductUpdateDto productUpdateDto)
+        [HttpPut("product variant/")]
+        public async Task<IActionResult> EditProductVariant(int productId, int variantId, [FromForm] ProductVariantDto variantDto)
         {
-            var result = await _productService.UpdateProductAsync(id, productUpdateDto);
-            if (!result) return NotFound();
-            return NoContent();
-        }
+            try
+            {
+                var product = await _productService.GetByIdAsync(productId);
+                if (product == null)
+                {
+                    return NotFound(new { message = "Product not found." });
+                }
 
-        [HttpDelete("{id}")]
+                var variant = product.ProductVariants.FirstOrDefault(v => v.Id == variantId);
+                if (variant == null)
+                {
+                    return NotFound(new { message = "Variant not found." });
+                }
+                variant.Size = variantDto.Size ?? variant.Size;
+                variant.Color = variantDto.Color ?? variant.Color;
+                variant.Quantity = variantDto.Quantity >= 0 ? variantDto.Quantity : variant.Quantity;
+                if (variantDto.ImgFile != null)
+                {
+                    variant.ImageUrl = await _azureBlobService.UploadAsync(variantDto.ImgFile);
+                }
+
+                _context.ProductVariants.Update(variant);
+                await _context.SaveChangesAsync();
+
+                return Ok(variant);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpPost("product variant/")]
+        public async Task<IActionResult> AddProductVariant(int productId, [FromForm] ProductVariantDto variantDto)
+        {
+            try
+            {
+                var product = await _productService.GetByIdAsync(productId);
+                if (product == null)
+                {
+                    return NotFound(new { message = "Product not found." });
+                }
+                var newVariant = new ProductVariant
+                {
+                    Size = variantDto.Size,
+                    Color = variantDto.Color,
+                    Quantity = variantDto.Quantity,
+                    ProductId = productId,
+                    ImageUrl = variantDto.ImgFile != null ? await _azureBlobService.UploadAsync(variantDto.ImgFile) : "default-image-url"
+                };
+                product.ProductVariants.Add(newVariant);
+                _context.Products.Update(product);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetProduct), new { id = productId }, newVariant);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpPut]
+        public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductDto productDto)
+        {
+            try
+            {
+                var product = await _productService.UpdateAsync(id, productDto);
+                if (product == null)
+                {
+                    return NotFound();
+                }
+                return Ok(product);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpDelete]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var result = await _productService.DeleteProductAsync(id);
-            if (!result) return NotFound();
+            var success = await _productService.DeleteAsync(id);
+            if (!success)
+            {
+                return NotFound();
+            }
             return NoContent();
         }
-
-        [HttpGet("category/{categoryName}")]
-        public async Task<IActionResult> GetProductsByCategoryName(string categoryName)
+        [HttpGet("variants/")]
+        public async Task<ActionResult<IEnumerable<ProductVariant>>> GetProductVariants(int productId)
         {
-            var products = await _productService.GetProductsByCategoryNameAsync(categoryName);
+            try
+            {
+                var variants = await _productService.GetProductSpecsAsync(productId);
+                return Ok(variants);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+        [HttpGet("brand/")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByBrand(int brandId, int pageSize = 10, int pageNumber = 1)
+        {
+            var products = await _productService.GetProductsByBrandAsync(brandId, pageSize, pageNumber);
             return Ok(products);
         }
-
-        [HttpGet("brand/{brandId}")]
-        public async Task<IActionResult> GetProductsByBrandId(int brandId)
+        [HttpGet("category/")]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(int categoryId, int pageSize = 10, int pageNumber = 1)
         {
-            var products = await _productService.GetProductsByBrandIdAsync(brandId);
+            var products = await _productService.GetProductsByCategoryAsync(categoryId, pageSize, pageNumber);
             return Ok(products);
         }
     }
