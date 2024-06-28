@@ -261,3 +261,5 @@ f:\Aqay project\Aqay\Implelentation\obj\Debug\net8.0\refint\aqay_apis.dll
 f:\Aqay project\Aqay\Implelentation\obj\Debug\net8.0\aqay_apis.pdb
 f:\Aqay project\Aqay\Implelentation\obj\Debug\net8.0\aqay_apis.genruntimeconfig.cache
 f:\Aqay project\Aqay\Implelentation\obj\Debug\net8.0\ref\aqay_apis.dll
+F:\Aqay project\Aqay\Implelentation\bin\Debug\net8.0\Azure.Storage.Blobs.dll
+F:\Aqay project\Aqay\Implelentation\bin\Debug\net8.0\Azure.Storage.Common.dll

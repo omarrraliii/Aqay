@@ -81,6 +81,7 @@ namespace aqay_apis.Context
         public DbSet<Order> Orders { get; set; }
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Report> Reports { get; set; }
+        public DbSet<ProductVariant> ProductVariants { get; set; }
         ////////////////// FOR TESTING 
         public DbSet<Merchant> Merchants { get; set; }
         public DbSet<Consumer> Consumers { get; set; }

@@ -7,7 +7,7 @@ public class Order
     public ShoppingCart ShoppingCart { get; set;}
     public PAYMENTOPTIONS PAYMENTOPTIONS { get; set;}
     public ORDERSTATUSES ORDERSTATUSES{ get; set;}
-    public double DeliveryFees { get; set;}
+    public double DeliveryFees { get; set;} 
     public double TotalPrice { get; set;}
     public DateTime CreatedOn { get; set;}
     public bool IsAccepted { get; set;}

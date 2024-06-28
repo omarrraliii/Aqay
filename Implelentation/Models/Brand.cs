@@ -20,7 +20,7 @@ namespace aqay_apis.Models
         public ICollection<Product> Products { get; set; }
         //one to one relationship with About
         public int AboutId { get; set; }
-        public About About { get; set; }
+        public About? About { get; set; }
         // list of id's of the ordered products
         // public ICollection<int> orderHistory { get; set; }
 

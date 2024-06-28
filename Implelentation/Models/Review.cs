@@ -6,7 +6,7 @@ public class Review
 {
     public int Id { get; set; }
     public string Description { get; set; }
-    public double Rate { get; set; }
+    public int Rate { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime LastEdit { get; set; }
     //One to One relationship with Consumer
