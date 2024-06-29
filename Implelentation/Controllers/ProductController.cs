@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using aqay_apis.Context;
-
 namespace aqay_apis.Controllers
 {
     [Route("api/[controller]")]
