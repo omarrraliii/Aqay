@@ -36,7 +36,7 @@ builder.Services.AddTransient<IMailingService, MailingService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IWishListService,WishListService>();
-
+builder.Services.AddScoped<IProductVariantService, ProductVariantService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
@@ -86,7 +86,6 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"]))
     };
 });
-
 var app = builder.Build();
 
 //intialize global variables

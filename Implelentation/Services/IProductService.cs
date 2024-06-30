@@ -6,8 +6,8 @@ namespace aqay_apis.Services
     {
         Task<IEnumerable<Product>> GetAllAsync(int pageSize, int pageNumber);
         Task<Product> GetByIdAsync(int id);
-        Task<Product> AddAsync(ProductDto productDto);
-        Task<Product> UpdateAsync(int id, ProductDto productDto);
+        Task<int> AddAsync(ProductDto productDto);
+        Task<int> UpdateAsync(int id, ProductDto productDto);
         Task<bool> DeleteAsync(int id);
         Task<IEnumerable<ProductVariant>> GetProductSpecsAsync(int productId);
         Task<IEnumerable<ProductDto>> GetProductsByBrandAsync(int brandId, int pageSize, int pageNumber);

@@ -43,7 +43,7 @@ namespace aqay_apis.Services
             }
             return product;
         }
-        public async Task<Product> AddAsync(ProductDto productDto)
+        public async Task<int> AddAsync(ProductDto productDto)
         {
             ValidateProductDto(productDto);
 
@@ -53,16 +53,7 @@ namespace aqay_apis.Services
                 throw new Exception("Category not found.");
             }
 
-            if (!productDto.ProductVariants.Any())
-            {
-                productDto.ProductVariants.Add(new ProductVariantDto
-                {
-                    Size = "Default",
-                    Color = "Default",
-                    Quantity = 0,
-                    ImgFile = null
-                });
-            }
+            
             var product = new Product
             {
                 Name = productDto.Name,
@@ -72,21 +63,15 @@ namespace aqay_apis.Services
                 LastEdit = DateTime.UtcNow,
                 CategoryId = productDto.CategoryId,
                 BrandId = productDto.BrandId,
-                ProductVariants = await Task.WhenAll(productDto.ProductVariants.Select(async v => new ProductVariant
-                {
-                    Size = v.Size,
-                    Color = v.Color,
-                    Quantity = v.Quantity,
-                    ImageUrl = v.ImgFile != null ? await _azureBlobService.UploadAsync(v.ImgFile) : "default-image-url"
-                }).ToList())
+                ProductVariants = null
             };
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
-            return product;
+            return product.Id;
         }
-        public async Task<Product> UpdateAsync(int id, ProductDto productDto)
+        public async Task<int> UpdateAsync(int id, ProductDto productDto)
         {
-            var product = await _context.Products.Include(p => p.ProductVariants).FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
             {
                 throw new Exception("Product not found.");
@@ -98,19 +83,9 @@ namespace aqay_apis.Services
             product.LastEdit = DateTime.UtcNow;
             product.CategoryId = productDto.CategoryId > 0 ? productDto.CategoryId : product.CategoryId;
             product.BrandId = productDto.BrandId > 0 ? productDto.BrandId : product.BrandId;
-            if (productDto.ProductVariants != null && productDto.ProductVariants.Any())
-            {
-                product.ProductVariants = await Task.WhenAll(productDto.ProductVariants.Select(async v => new ProductVariant
-                {
-                    Size = v.Size,
-                    Color = v.Color,
-                    Quantity = v.Quantity,
-                    ImageUrl = await _azureBlobService.UploadAsync(v.ImgFile)
-                }).ToList());
-            }
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
-            return product;
+            return product.Id;
         }
         public async Task<bool> DeleteAsync(int id)
         {

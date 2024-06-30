@@ -9,14 +9,12 @@ namespace aqay_apis.Services
         private readonly ApplicationDbContext _context;
         private readonly IProductService _productService;
         private readonly IAzureBlobService _azureBlobService;
-
         public ProductVariantService(ApplicationDbContext context, IAzureBlobService azureBlobService, IProductService productService)
         {
             _context = context;
             _productService = productService;
             _azureBlobService = azureBlobService;
         }
-
         public async Task<IEnumerable<ProductVariant>> GetAllAsync()
         {
             return await _context.ProductVariants.ToListAsync();
@@ -30,7 +28,7 @@ namespace aqay_apis.Services
             }
             return productVariant;
         }
-        public async Task<ProductVariant> AddAsync(ProductVariantDto productVariantDto)
+        public async Task<bool> AddAsync(ProductVariantDto productVariantDto)
         {
             ValidateProductVariantDto(productVariantDto);
 
@@ -48,9 +46,9 @@ namespace aqay_apis.Services
 
             await _context.ProductVariants.AddAsync(productVariant);
             await _context.SaveChangesAsync();
-            return productVariant;
+            return true;
         }
-        public async Task<ProductVariant> UpdateAsync(int id, ProductVariantDto productVariantDto)
+        public async Task<bool> UpdateAsync(int id, ProductVariantDto productVariantDto)
         {
             var productVariant = await _context.ProductVariants.FindAsync(id);
             if (productVariant == null)
@@ -83,7 +81,7 @@ namespace aqay_apis.Services
 
             _context.ProductVariants.Update(productVariant);
             await _context.SaveChangesAsync();
-            return productVariant;
+            return true;
         }
         public async Task<bool> DeleteAsync(int id)
         {
@@ -97,14 +95,14 @@ namespace aqay_apis.Services
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<ProductVariant> IncrementQuantityAsync(int id, int incrementBy)
+        public async Task<int> IncrementQuantityAsync(int id, int incrementBy)
         {
             var productVariant = await GetByIdAsync(id);
             productVariant.Quantity += incrementBy;
             await _context.SaveChangesAsync();
-            return productVariant;
+            return productVariant.Quantity;
         }
-        public async Task<ProductVariant> DecrementQuantityAsync(int id, int decrementBy)
+        public async Task<int> DecrementQuantityAsync(int id, int decrementBy)
         {
             var productVariant = await GetByIdAsync(id);
             if (productVariant.Quantity < decrementBy)
@@ -113,7 +111,7 @@ namespace aqay_apis.Services
             }
             productVariant.Quantity -= decrementBy;
             await _context.SaveChangesAsync();
-            return productVariant;
+            return productVariant.Quantity;
         }
         private void ValidateProductVariantDto(ProductVariantDto productVariantDto, bool isNew = true)
         {

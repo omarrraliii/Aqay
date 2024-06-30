@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using aqay_apis.Context;
+using Microsoft.CodeAnalysis;
 namespace aqay_apis.Controllers
 {
     [Route("api/[controller]")]
@@ -39,12 +40,12 @@ namespace aqay_apis.Controllers
             return Ok(product);
         }
         [HttpPost]
-        public async Task<ActionResult<Product>> AddProduct([FromForm] ProductDto productDto)
+        public async Task<ActionResult<Product>> AddProduct([FromBody] ProductDto productDto)
         {
             try
             {
-                var product = await _productService.AddAsync(productDto);
-                return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+                var productId = await _productService.AddAsync(productDto);
+                return Ok(productId);
             }
             catch (Exception ex)
             {
@@ -52,11 +53,11 @@ namespace aqay_apis.Controllers
             }
         }
         [HttpPut("product variant/")]
-        public async Task<IActionResult> EditProductVariant(int productId, int variantId, [FromForm] ProductVariantDto variantDto)
+        public async Task<IActionResult> EditProductVariant(int variantId, [FromForm] ProductVariantDto variantDto)
         {
             try
             {
-                var product = await _productService.GetByIdAsync(productId);
+                var product = await _productService.GetByIdAsync(variantDto.ProductId);
                 if (product == null)
                 {
                     return NotFound(new { message = "Product not found." });
@@ -78,7 +79,7 @@ namespace aqay_apis.Controllers
                 _context.ProductVariants.Update(variant);
                 await _context.SaveChangesAsync();
 
-                return Ok(variant);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -86,11 +87,11 @@ namespace aqay_apis.Controllers
             }
         }
         [HttpPost("product variant/")]
-        public async Task<IActionResult> AddProductVariant(int productId, [FromForm] ProductVariantDto variantDto)
+        public async Task<IActionResult> AddProductVariant([FromForm] ProductVariantDto variantDto)
         {
             try
             {
-                var product = await _productService.GetByIdAsync(productId);
+                var product = await _productService.GetByIdAsync(variantDto.ProductId);
                 if (product == null)
                 {
                     return NotFound(new { message = "Product not found." });
@@ -100,14 +101,14 @@ namespace aqay_apis.Controllers
                     Size = variantDto.Size,
                     Color = variantDto.Color,
                     Quantity = variantDto.Quantity,
-                    ProductId = productId,
+                    ProductId = variantDto.ProductId,
                     ImageUrl = variantDto.ImgFile != null ? await _azureBlobService.UploadAsync(variantDto.ImgFile) : "default-image-url"
                 };
                 product.ProductVariants.Add(newVariant);
                 _context.Products.Update(product);
                 await _context.SaveChangesAsync();
 
-                return CreatedAtAction(nameof(GetProduct), new { id = productId }, newVariant);
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -115,16 +116,12 @@ namespace aqay_apis.Controllers
             }
         }
         [HttpPut]
-        public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductDto productDto)
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDto productDto)
         {
             try
             {
-                var product = await _productService.UpdateAsync(id, productDto);
-                if (product == null)
-                {
-                    return NotFound();
-                }
-                return Ok(product);
+                var productId = await _productService.UpdateAsync(id, productDto);
+                return Ok(productId);
             }
             catch (Exception ex)
             {
@@ -141,6 +138,7 @@ namespace aqay_apis.Controllers
             }
             return NoContent();
         }
+        /// productttt
         [HttpGet("variants/")]
         public async Task<ActionResult<IEnumerable<ProductVariant>>> GetProductVariants(int productId)
         {
