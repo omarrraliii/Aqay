@@ -1,4 +1,6 @@
-﻿namespace aqay_apis;
+﻿using aqay_apis.Models;
+
+namespace aqay_apis;
 
 public class Plan
 {
@@ -6,5 +8,5 @@ public class Plan
     public string Name { get; set; }
     public string Describtion { get; set; }
     public double Price { get; set; }
-    public Subscription Subscription { get; set; }
+    public ICollection<Subscription> Subscriptions { get; set; }
 }
