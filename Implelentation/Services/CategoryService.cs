@@ -6,35 +6,31 @@ namespace aqay_apis.Services
     public class CategoryService : ICategoryService
     {
         private readonly ApplicationDbContext _context;
-        private readonly GlobalVariables _globalVariable;
+        private const int PageSize = 10;
 
         // constructor 
-        public CategoryService(ApplicationDbContext context, GlobalVariables globalVariable)
+        public CategoryService(ApplicationDbContext context)
         {
             _context = context;
-            _globalVariable = globalVariable;
         }
         // Read all categories as 10 categories by page
         public async Task<IEnumerable<Category>> getCategories(int page)
         {
             return await _context.Categories
-                                 .Skip((page - 1) * _globalVariable.PageSize)
-                                 .Take(_globalVariable.PageSize)
+                                 .Skip((page - 1) * PageSize)
+                                 .Take(PageSize)
                                  .ToListAsync();
         }
         // Read Category by it's ID
         public async Task<Category> getCategoryById(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null) {
-                throw new Exception("Category not found.");
-            }
-            return category;
+            return await _context.Categories.FindAsync(id);
         }
         // Read Category by it's name
         public async Task<Category> getCategoryByName(string name)
         {
-            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower());
+            name = name.ToLower();
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Name == name);
             if ( category == null)
             {
                 throw new Exception("Category not found.");
@@ -44,7 +40,8 @@ namespace aqay_apis.Services
         // Create a new category
         public async Task<Category> createCategory(string name)
         {
-            if (await _context.Categories.FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower()) != null)
+            name = name.ToLower();
+            if (await _context.Categories.FirstOrDefaultAsync(c => c.Name == name) != null)
             {
                 throw new Exception("Category already exists ");
             }
@@ -59,7 +56,9 @@ namespace aqay_apis.Services
         // Update an existing category 
         public async Task<Category> updateCategory(string oldName, string newName)
         {
-            var existingCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name.ToLower() == oldName.ToLower());
+            oldName = oldName.ToLower();
+            newName = newName.ToLower();
+            var existingCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == oldName);
             if (existingCategory == null)
             {
                 throw new Exception("Category not found.");
@@ -72,7 +71,8 @@ namespace aqay_apis.Services
         // Delete an existing category 
         public async Task<bool> deleteCategory(string name)
         {
-            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower());
+            name.ToLower();
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Name == name);
             if (category == null)
             {
                 return false;

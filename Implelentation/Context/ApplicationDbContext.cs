@@ -47,6 +47,12 @@ namespace aqay_apis.Context
                 .WithOne(w => w.Consumer)
                 .HasForeignKey<Consumer>(w => w.WishListId)
                 .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Merchant>()
+                .HasOne(m => m.Subscription)
+                .WithOne(s => s.Merchant)
+                .HasForeignKey<Merchant>(m => m.SubscriptionId);
+
+            //base.OnModelCreating(modelBuilder);
 
 
             builder.Entity<Plan>().HasData(
@@ -81,7 +87,6 @@ namespace aqay_apis.Context
         public DbSet<Order> Orders { get; set; }
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Report> Reports { get; set; }
-        public DbSet<ProductVariant> ProductVariants { get; set; }
         ////////////////// FOR TESTING 
         public DbSet<Merchant> Merchants { get; set; }
         public DbSet<Consumer> Consumers { get; set; }

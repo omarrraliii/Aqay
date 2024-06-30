@@ -15,7 +15,7 @@ To run the project locally, follow these steps:
     - Create a new project.
     - Choose "ASP.NET Core Web Application".
     - Name the application "aqay_apis".
-    - Select ASP.NET Core 6 as the target framework.
+    - Select ASP.NET Core 8 as the target framework.
     - Choose "API" template.
     - Select "No Authentication".
     - Uncheck the option for configuring HTTPS.
@@ -23,26 +23,28 @@ To run the project locally, follow these steps:
 4. **Install Packages**:
    - Install the following packages from NuGet Package Manager:
      ```powershell
-     Install-Package Microsoft.AspNetCore.Authentication.JwtBearer -Version 6.0.0
-     Install-Package Microsoft.AspNetCore.Identity.EntityFrameworkCore -Version 6.0.0
-     Install-Package Microsoft.EntityFrameworkCore -Version 6.0.0
-     Install-Package Microsoft.EntityFrameworkCore.Design -Version 6.0.0
-     Install-Package Microsoft.EntityFrameworkCore.SqlServer -Version 6.0.0
-     Install-Package Microsoft.EntityFrameworkCore.Tools -Version 6.0.0
-     Install-Package Microsoft.VisualStudio.Web.CodeGeneration.Design -Version 6.0.0
-     Install-Package System.IdentityModel.Tokens.Jwt -Version 6.0.0
+     Install-Package Microsoft.AspNetCore.Authentication.JwtBearer -Version 8.0.0
+     Install-Package Microsoft.AspNetCore.Identity.EntityFrameworkCore -Version 8.0.0
+     Install-Package Microsoft.EntityFrameworkCore -Version 8.0.0
+     Install-Package Microsoft.EntityFrameworkCore.Design -Version 8.0.0
+     Install-Package Microsoft.EntityFrameworkCore.SqlServer -Version 8.0.0
+     Install-Package Microsoft.EntityFrameworkCore.Tools -Version 8.0.0
+     Install-Package Microsoft.VisualStudio.Web.CodeGeneration.Design -Version 8.0.0
+     Install-Package System.IdentityModel.Tokens.Jwt -Version 8.0.0
+     Install-Package Azure.Storage.Blobs -Version 12.10.0
      ```
 
    - Alternatively, you can install these packages using Package Manager Console:
      ```powershell
-     Install-Package Microsoft.AspNetCore.Authentication.JwtBearer -Version 6.0.0
-     Install-Package Microsoft.AspNetCore.Identity.EntityFrameworkCore -Version 6.0.0
-     Install-Package Microsoft.EntityFrameworkCore -Version 6.0.0
-     Install-Package Microsoft.EntityFrameworkCore.Design -Version 6.0.0
-     Install-Package Microsoft.EntityFrameworkCore.SqlServer -Version 6.0.0
-     Install-Package Microsoft.EntityFrameworkCore.Tools -Version 6.0.0
-     Install-Package Microsoft.VisualStudio.Web.CodeGeneration.Design -Version 6.0.0
-     Install-Package System.IdentityModel.Tokens.Jwt -Version 6.0.0
+     Install-Package Microsoft.AspNetCore.Authentication.JwtBearer -Version 8.0.0
+     Install-Package Microsoft.AspNetCore.Identity.EntityFrameworkCore -Version 8.0.0
+     Install-Package Microsoft.EntityFrameworkCore -Version 8.0.0
+     Install-Package Microsoft.EntityFrameworkCore.Design -Version 8.0.0
+     Install-Package Microsoft.EntityFrameworkCore.SqlServer -Version 8.0.0
+     Install-Package Microsoft.EntityFrameworkCore.Tools -Version 8.0.0
+     Install-Package Microsoft.VisualStudio.Web.CodeGeneration.Design -Version 8.0.0
+     Install-Package System.IdentityModel.Tokens.Jwt -Version 8.0.0
+     Install-Package Azure.Storage.Blobs -Version 12.10.0
      ```
 
 5. **Generate Key**:
@@ -67,4 +69,4 @@ To run the project locally, follow these steps:
 
 ---
 
-These steps should guide you through setting up and running the project locally in Visual Studio. Let me know if you need further assistance!
+These steps should guide you through setting up and running the project locally in Visual Studio with the updated package versions. Let me know if you need further assistance!

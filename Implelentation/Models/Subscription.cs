@@ -1,6 +1,6 @@
-﻿using aqay_apis.Models;
+﻿using static aqay_apis.Helpers.Enums;
 
-namespace aqay_apis;
+namespace aqay_apis.Models;
 
 public class Subscription
 {
@@ -10,5 +10,6 @@ public class Subscription
     public Merchant Merchant { get; set; }
     public int PlanId { get; set; }
     public Plan Plan { get; set; }
+    public SubscriptionStatus Status { get; set; }
 
 }
