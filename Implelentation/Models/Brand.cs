@@ -17,12 +17,9 @@ namespace aqay_apis.Models
         public string BrandOwnerId { get; set; }
         public Merchant BrandOwner { get; set; } //navigation property
         //one to many relationship with Products
-        public ICollection<Product> Products { get; set; }
+        public ICollection<Product>? Products { get; set; }
         //one to one relationship with About
-        public int AboutId { get; set; }
-        public About? About { get; set; }
-        // list of id's of the ordered products
-        // public ICollection<int> orderHistory { get; set; }
+        public string? About { get; set; }
 
     }
 }
