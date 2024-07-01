@@ -46,12 +46,6 @@ namespace aqay_apis.Controllers
                 return BadRequest(ModelState);
             }
             var result = await _authService.SignupMerchantAsync(model);
-
-            // check if the model is authenticated
-            if (!result.IsAuthenticated)
-            {
-                return BadRequest(result.Message);
-            }
             return Ok(result);
         }
 

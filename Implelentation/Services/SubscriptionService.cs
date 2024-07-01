@@ -65,6 +65,8 @@ namespace aqay_apis.Services
                 Merchant = merchant
             };
 
+            merchant.IsSubscriped = true;
+
             _context.Subscriptions.Add(subscription);
             await _context.SaveChangesAsync();
 

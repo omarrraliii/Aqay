@@ -18,6 +18,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString)
 );
+
 // Introduce global variable service
 builder.Services.AddSingleton<GlobalVariables>();
 
@@ -32,15 +33,16 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 // Introduce MailingService
 builder.Services.AddTransient<IMailingService, MailingService>();
 
-// Introduce systems services
+// Introduce system services
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IWishListService,WishListService>();
+builder.Services.AddScoped<IWishListService, WishListService>();
 builder.Services.AddScoped<IProductVariantService, ProductVariantService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 
-// Introduce Azure img Service 
+// Introduce Azure Blob Service 
 builder.Services.AddSingleton<IAzureBlobService, AzureBlobService>();
 
 // Add controllers and endpoints
@@ -86,11 +88,12 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"]))
     };
 });
+
 var app = builder.Build();
 
-//intialize global variables
-var GlobalVariables=app.Services.GetRequiredService<GlobalVariables>();
-GlobalVariables.PageSize=10;
+// Initialize global variables
+var globalVariables = app.Services.GetRequiredService<GlobalVariables>();
+globalVariables.PageSize = 10;
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())

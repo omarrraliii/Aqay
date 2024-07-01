@@ -5,7 +5,7 @@ namespace aqay_apis.Services
     public interface IAuthService
     {
         // sign up as a brand owener
-        Task<AuthModel> SignupMerchantAsync(SignupMerchantModel model);
+        Task<string> SignupMerchantAsync(SignupMerchantModel model);
         // sign up as a consumer
         Task<AuthModel> SignupConsumerAsync(SignupConsumerModel model);
 
