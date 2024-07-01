@@ -33,7 +33,6 @@ namespace aqay_apis.Services
             var pendingMercants = await _context.Set<PendingMerchant>().Skip((pageindex - 1) * _globalVariables.PageSize)
                         .Take(_globalVariables.PageSize)
                         .ToListAsync();
-
             var pendingMercantsCount = pendingMercants.Count;
             var PaginatedResult = new PaginatedResult<PendingMerchant>
             {
@@ -102,7 +101,7 @@ namespace aqay_apis.Services
 
             await _userManager.UpdateAsync(user);
 
-            return $"Activity toggled for user {user.UserName}";
+            return $"Activity toggled for user {user.Email} to {user.IsActive}";
         }
         public async Task<PaginatedResult<Consumer>> ListAllConsumersAsync(int pageIndex)
         {

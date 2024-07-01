@@ -67,7 +67,24 @@ namespace aqay_apis.Controllers
             }
             return Ok(result);
         }
+        // POST ENDPOINT: Create an admin
+        [HttpPost("CreateAdmin")]
+        public async Task<IActionResult> CreateAdminAsync([FromBody] LoginModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            var result = await _authService.CreateAdminAsync(model.Email, model.Password);
+
+            if (result != "Admin created successfully!")
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
 
     }
 }

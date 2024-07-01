@@ -77,6 +77,7 @@ namespace aqay_apis.Services
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
             authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authModel.UserName = user.UserName;
+            authModel.isSubscribed = true;
 
             var roles = await _userManager.GetRolesAsync(user);
             authModel.Roles = roles.ToList();
@@ -144,7 +145,8 @@ namespace aqay_apis.Services
                 IsAuthenticated = true,
                 Roles = new List<string> { "Consumer" },
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                UserName = userName
+                UserName = userName,
+                isSubscribed = true
             };
 
         }
@@ -246,6 +248,39 @@ namespace aqay_apis.Services
                 signingCredentials: signingCredentials);
 
             return jwtSecurityToken;
+        }
+
+        public async Task<string> CreateAdminAsync(string email, string password)
+        {
+            if (await _userManager.FindByEmailAsync(email) is not null)
+            {
+                return "Email is already registered!";
+            }
+
+            string[] emailParts = email.Split('@');
+            string userName = emailParts[0];
+
+            var adminUser = new User
+            {
+                Email = email,
+                UserName = userName
+            };
+
+            var result = await _userManager.CreateAsync(adminUser, password);
+
+            if (!result.Succeeded)
+            {
+                var errors = " ";
+                foreach (var error in result.Errors)
+                {
+                    errors += $"{error.Description}\n";
+                }
+                return errors;
+            }
+
+            await _userManager.AddToRoleAsync(adminUser, "Admin");
+
+            return "Admin created successfully!";
         }
     }
 }

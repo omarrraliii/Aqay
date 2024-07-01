@@ -51,6 +51,7 @@ namespace aqay_apis.Services
                 throw new Exception("Plan not found.");
             }
 
+            // Create new subscription
             var subscription = new Subscription
             {
                 StartDate = DateTime.Now,
@@ -65,16 +66,17 @@ namespace aqay_apis.Services
                 Merchant = merchant
             };
 
+            // Update merchant subscription status
             merchant.IsSubscriped = true;
 
+            // Add subscription and update merchant in a single transaction
             _context.Subscriptions.Add(subscription);
-            await _context.SaveChangesAsync();
-
             merchant.SubscriptionId = subscription.Id;
             merchant.Subscription = subscription;
-
             _context.Merchants.Update(merchant);
+
             await _context.SaveChangesAsync();
+
         }
         public IEnumerable<PAYMENTOPTIONS> GetAllPaymentOptions()
         {

@@ -11,5 +11,6 @@ namespace aqay_apis.Services
 
         // Log in = Get Token (fetsh the token to allow authentication)
         Task<AuthModel> LoginAsync(LoginModel model);
+        Task<string> CreateAdminAsync(string email, string password);
     }
 }
