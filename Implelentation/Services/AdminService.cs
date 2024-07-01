@@ -58,8 +58,6 @@ namespace aqay_apis.Services
                 IsVerified = true,
                 IsOwner = true,
                 IsSubscriped = false,
-                Subscription = null,
-                SubscriptionId = 1
             };
             // register the new Merchant  in the db
             var result = await _userManager.CreateAsync(newMerchant, pendingMerchant.Password);
@@ -69,6 +67,7 @@ namespace aqay_apis.Services
             /*
              * create brand 
              * link brand to merchant
+             *  
              */
 
 

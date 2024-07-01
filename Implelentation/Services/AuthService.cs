@@ -62,12 +62,16 @@ namespace aqay_apis.Services
                     return authModel;
 
                 }
-                var isSubscribed = merchant.IsSubscriped;
-                if (!isSubscribed)
+                if (!merchant.IsSubscriped)
                 {
                     authModel.Message = "User is a merchant but not subscribed. Cannot log in.";
                     return authModel;
                 }
+                authModel.isSubscriped = false;
+            }
+            else
+            {
+                authModel.isSubscriped = true;
             }
 
             var jwtSecurityToken = await CreateJwtToken(user);
@@ -77,8 +81,6 @@ namespace aqay_apis.Services
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
             authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authModel.UserName = user.UserName;
-            authModel.isSubscribed = true;
-
             var roles = await _userManager.GetRolesAsync(user);
             authModel.Roles = roles.ToList();
 
@@ -146,7 +148,7 @@ namespace aqay_apis.Services
                 Roles = new List<string> { "Consumer" },
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 UserName = userName,
-                isSubscribed = true
+                isSubscriped = true
             };
 
         }

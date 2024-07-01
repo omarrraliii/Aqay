@@ -9,7 +9,7 @@ namespace aqay_apis.Models
         public bool IsOwner { get; set; }
         public bool IsSubscriped { get; set; }
         //one to one relationship
-        public int SubscriptionId { get; set; }
+        public int? SubscriptionId { get; set; }
         public Subscription? Subscription { get; set; }
     }
 }

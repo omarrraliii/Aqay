@@ -30,11 +30,10 @@ namespace aqay_apis.Services
         // Subscripe to a plan
         public async Task SubscribeAsync(string userId, int planId)
         {
-
-            // retrive merchant by ID and check if owner
+            // Retrieve merchant by ID and check if owner
             var merchant = await _context.Merchants
-                             .Include(u => u.Subscription)
-                             .FirstOrDefaultAsync(u => u.Id == userId);
+                                 .Include(u => u.Subscription)
+                                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (merchant == null)
             {
@@ -43,14 +42,29 @@ namespace aqay_apis.Services
             if (!merchant.IsOwner)
             {
                 throw new Exception("Merchant not an Owner.");
-            }
-            var plan = await _context.Plans.FindAsync(planId);
+            }           
 
+            // Update merchant subscription status
+            merchant.IsSubscriped = true;
+
+            // Add subscription and update merchant in a single transaction
+            var sub = await CreateAsync(planId);
+
+
+            merchant.Subscription = sub;
+            merchant.SubscriptionId = sub.Id;
+            _context.Merchants.Update(merchant);
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Subscription> CreateAsync(int planId)
+        {
+            var plan = await _context.Plans.FindAsync(planId);
             if (plan == null)
             {
                 throw new Exception("Plan not found.");
             }
-
             // Create new subscription
             var subscription = new Subscription
             {
@@ -63,20 +77,11 @@ namespace aqay_apis.Services
                     _ => throw new Exception("Invalid plan type.")
                 },
                 PlanId = plan.Id,
-                Merchant = merchant
+                Merchant = null
             };
-
-            // Update merchant subscription status
-            merchant.IsSubscriped = true;
-
-            // Add subscription and update merchant in a single transaction
             _context.Subscriptions.Add(subscription);
-            merchant.SubscriptionId = subscription.Id;
-            merchant.Subscription = subscription;
-            _context.Merchants.Update(merchant);
-
             await _context.SaveChangesAsync();
-
+            return subscription;
         }
         public IEnumerable<PAYMENTOPTIONS> GetAllPaymentOptions()
         {

@@ -5,6 +5,7 @@
         Task<ICollection<Plan>> GetAllPlansAsync();
         Task<Plan> GetPlanByIdAsync(int planId);
         Task SubscribeAsync(string userId, int planId);
+        Task <Subscription> CreateAsync(int planId);
         IEnumerable<PAYMENTOPTIONS> GetAllPaymentOptions();
     }
 }
