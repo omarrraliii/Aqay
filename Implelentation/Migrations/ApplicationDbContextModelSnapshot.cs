@@ -170,27 +170,6 @@ namespace aqay_apis.Migrations
                     b.ToTable("ProductTag");
                 });
 
-            modelBuilder.Entity("aqay_apis.About", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Creator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Info")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Abouts");
-                });
-
             modelBuilder.Entity("aqay_apis.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -237,11 +216,10 @@ namespace aqay_apis.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AboutId")
-                        .HasColumnType("int");
+                    b.Property<string>("About")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BrandOwnerId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedOn")
@@ -272,11 +250,9 @@ namespace aqay_apis.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AboutId")
-                        .IsUnique();
-
                     b.HasIndex("BrandOwnerId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[BrandOwnerId] IS NOT NULL");
 
                     b.ToTable("Brands");
                 });
@@ -921,19 +897,9 @@ namespace aqay_apis.Migrations
 
             modelBuilder.Entity("aqay_apis.Models.Brand", b =>
                 {
-                    b.HasOne("aqay_apis.About", "About")
-                        .WithOne("Brand")
-                        .HasForeignKey("aqay_apis.Models.Brand", "AboutId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("aqay_apis.Models.Merchant", "BrandOwner")
                         .WithOne("Brand")
-                        .HasForeignKey("aqay_apis.Models.Brand", "BrandOwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("About");
+                        .HasForeignKey("aqay_apis.Models.Brand", "BrandOwnerId");
 
                     b.Navigation("BrandOwner");
                 });
@@ -1063,12 +1029,6 @@ namespace aqay_apis.Migrations
                         .HasForeignKey("aqay_apis.Models.Merchant", "SubscriptionId");
 
                     b.Navigation("Subscription");
-                });
-
-            modelBuilder.Entity("aqay_apis.About", b =>
-                {
-                    b.Navigation("Brand")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("aqay_apis.Category", b =>

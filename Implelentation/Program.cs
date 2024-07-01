@@ -32,6 +32,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Introduce MailingService
 builder.Services.AddTransient<IMailingService, MailingService>();
+//add httpClient
+builder.Services.AddHttpClient();
 
 // Introduce system services
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();

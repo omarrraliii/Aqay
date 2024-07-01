@@ -67,11 +67,11 @@ namespace aqay_apis.Services
                     authModel.Message = "User is a merchant but not subscribed. Cannot log in.";
                     return authModel;
                 }
-                authModel.isSubscriped = false;
+                authModel.isSub = false;
             }
             else
             {
-                authModel.isSubscriped = true;
+                authModel.isSub = true;
             }
 
             var jwtSecurityToken = await CreateJwtToken(user);
@@ -148,7 +148,7 @@ namespace aqay_apis.Services
                 Roles = new List<string> { "Consumer" },
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 UserName = userName,
-                isSubscriped = true
+                isSub = true
             };
 
         }
