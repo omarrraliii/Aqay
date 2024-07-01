@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using aqay_apis.Context;
 
@@ -11,9 +12,11 @@ using aqay_apis.Context;
 namespace aqay_apis.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240701165457_checkForUpdates")]
+    partial class checkForUpdates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -843,7 +846,7 @@ namespace aqay_apis.Migrations
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("SubscriptionId")
+                    b.Property<int>("SubscriptionId")
                         .HasColumnType("int");
 
                     b.HasIndex("SubscriptionId")
@@ -1060,7 +1063,9 @@ namespace aqay_apis.Migrations
                 {
                     b.HasOne("aqay_apis.Subscription", "Subscription")
                         .WithOne("Merchant")
-                        .HasForeignKey("aqay_apis.Models.Merchant", "SubscriptionId");
+                        .HasForeignKey("aqay_apis.Models.Merchant", "SubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Subscription");
                 });
@@ -1115,7 +1120,8 @@ namespace aqay_apis.Migrations
 
             modelBuilder.Entity("aqay_apis.Subscription", b =>
                 {
-                    b.Navigation("Merchant");
+                    b.Navigation("Merchant")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("aqay_apis.WishList", b =>

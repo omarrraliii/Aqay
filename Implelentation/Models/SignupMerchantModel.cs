@@ -13,7 +13,7 @@ namespace aqay_apis.Models
         public string PasswordConfirm { get; set; }
         [Required]
         public string PhoneNumber { get; set; }
-        public string TaxRegistrationNumber { get; set; }
-        public string NationalId { get; set; }
+        public string? TaxRegistrationNumber { get; set; }
+        public string? NationalId { get; set; }
     }
 }

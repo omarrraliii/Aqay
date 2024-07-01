@@ -30,8 +30,6 @@ namespace aqay_apis.Context
 
 
 
-
-
             builder.Entity<Consumer>()
                 .HasOne(c => c.Review)
                 .WithOne(r => r.Consumer)
@@ -81,6 +79,7 @@ namespace aqay_apis.Context
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Report> Reports { get; set; }
         public DbSet<ProductVariant> ProductVariants { get; set; }
+        public DbSet<PendingMerchant> PendingMerchants { get; set; }
         ////////////////// FOR TESTING 
         public DbSet<Merchant> Merchants { get; set; }
         public DbSet<Consumer> Consumers { get; set; }
