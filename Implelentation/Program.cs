@@ -39,12 +39,18 @@ builder.Services.AddScoped<IWishListService,WishListService>();
 builder.Services.AddScoped<IProductVariantService, ProductVariantService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IBrandService,BrandService>();
+builder.Services.AddScoped<ITagService,TagService>();
 
 // Introduce Azure img Service 
 builder.Services.AddSingleton<IAzureBlobService, AzureBlobService>();
 
 // Add controllers and endpoints
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

@@ -8,6 +8,6 @@ public class BrandDto
     public string? Instagram { get; set; }
     public string? Facebook { get; set; }
     public string? WPNumber { get; set; }
-    public string BrandOwnerId { get; set; }
+    public string? BrandOwnerId { get; set; }
     public string About { get; set; }
 }

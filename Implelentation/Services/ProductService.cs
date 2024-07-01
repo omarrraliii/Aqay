@@ -2,6 +2,7 @@
 using aqay_apis.Dtos;
 using aqay_apis.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +16,15 @@ namespace aqay_apis.Services
         private readonly ICategoryService _categoryService;
         //private readonly IBrandService _brandService;
         private readonly IAzureBlobService _azureBlobService;
+        private readonly ITagService _tagService;
 
-        public ProductService(ApplicationDbContext context, ICategoryService categoryService, IAzureBlobService azureBlobService)
+        public ProductService(ApplicationDbContext context, ICategoryService categoryService, IAzureBlobService azureBlobService, ITagService tagService)
         {
             _context = context;
             _categoryService = categoryService;
-           // _brandService = brandService;
+            // _brandService = brandService;
             _azureBlobService = azureBlobService;
+            _tagService = tagService;
         }
         public async Task<IEnumerable<Product>> GetAllAsync(int pageSize, int pageNumber)
         {
@@ -35,6 +38,7 @@ namespace aqay_apis.Services
         {
             var product = await _context.Products
                 .Include(p => p.ProductVariants)
+                .Include(p => p.Tags)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
@@ -53,25 +57,44 @@ namespace aqay_apis.Services
                 throw new Exception("Category not found.");
             }
 
-            
+
             var product = new Product
             {
                 Name = productDto.Name,
                 Price = productDto.Price,
                 Description = productDto.Description,
-                CreatedOn = DateTime.UtcNow,
-                LastEdit = DateTime.UtcNow,
+                CreatedOn = DateTime.Now,
+                LastEdit = DateTime.Now,
                 CategoryId = productDto.CategoryId,
                 BrandId = productDto.BrandId,
-                ProductVariants = null
+                ProductVariants = null,
+                Tags = new List<Tag>()
             };
+            if (productDto.TagName != null && productDto.TagName.Any())
+            {
+                foreach (var tag in productDto.TagName)
+                {
+                    var retrievedTag = await _tagService.GetTagByNameAsync(tag);
+                    if (retrievedTag == null)
+                    {
+                        var CreatedTag = await _tagService.CreateTagAsync(tag);
+                        product.Tags.Add(CreatedTag);
+                    }
+                    else
+                    {
+                        product.Tags.Add(retrievedTag);
+                    }
+
+                }
+            }
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
             return product.Id;
         }
         public async Task<int> UpdateAsync(int id, ProductDto productDto)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _context.Products.Include(p => p.Tags)
+                                                .FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
             {
                 throw new Exception("Product not found.");
@@ -80,9 +103,39 @@ namespace aqay_apis.Services
             product.Name = productDto.Name ?? product.Name;
             product.Price = productDto.Price >= 0 ? productDto.Price : product.Price;
             product.Description = productDto.Description ?? product.Description;
-            product.LastEdit = DateTime.UtcNow;
+            product.LastEdit = DateTime.Now;
             product.CategoryId = productDto.CategoryId > 0 ? productDto.CategoryId : product.CategoryId;
             product.BrandId = productDto.BrandId > 0 ? productDto.BrandId : product.BrandId;
+            if (productDto.TagName != null && productDto.TagName.Any())
+            {
+                var tagNamesFromDto = productDto.TagName.Select(t => t.ToLower()).ToHashSet();
+                var tagsToRemove = product.Tags.Where(t => !tagNamesFromDto.Contains(t.Name.ToLower())).ToList();
+                foreach (var tag in tagsToRemove)
+                {
+                    product.Tags.Remove(tag);
+                }
+
+                var existingTagNames = product.Tags.Select(t => t.Name).ToHashSet();
+                foreach (var tag in productDto.TagName)
+                {
+                    if (!existingTagNames.Contains(tag))
+                    {
+
+
+                        var retrievedTag = await _tagService.GetTagByNameAsync(tag);
+                        if (retrievedTag == null)
+                        {
+                            var CreatedTag = await _tagService.CreateTagAsync(tag);
+                            product.Tags.Add(CreatedTag);
+                        }
+                        else
+                        {
+                            product.Tags.Add(retrievedTag);
+                        }
+                    }
+
+                }
+            }
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
             return product.Id;

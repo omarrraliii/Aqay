@@ -37,7 +37,6 @@ public class WishListService : IWishListService
 
     public async Task<WishList> CreateWishListAsync(Consumer consumer)
     {
-        var products=new List<Product>();
         var wishList=new WishList
         {
             Consumer=consumer
@@ -68,7 +67,8 @@ public class WishListService : IWishListService
         {
             throw new Exception($"{id} was not found.");
         }
-        var products=wishList.Products.Skip((pageindex-1)*_globalVariables.PageSize)
+        var products=wishList.Products.OrderByDescending(p=>p.Name)
+                        .Skip((pageindex-1)*_globalVariables.PageSize)
                         .Take(_globalVariables.PageSize)
                         .ToList();
         var productCount=wishList.Products.Count;

@@ -14,8 +14,8 @@ namespace aqay_apis.Models
         public string? Facebook { get; set; }
         public string? WPNumber { get; set; }
         // one-to-one relationship
-        public string BrandOwnerId { get; set; }
-        public Merchant BrandOwner { get; set; } //navigation property
+        public string? BrandOwnerId { get; set; }
+        public Merchant? BrandOwner { get; set; } //navigation property
         //one to many relationship with Products
         public ICollection<Product>? Products { get; set; }
         //one to one relationship with About
