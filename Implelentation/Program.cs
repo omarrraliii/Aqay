@@ -41,6 +41,7 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IBrandService,BrandService>();
 builder.Services.AddScoped<ITagService,TagService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 // Introduce Azure img Service 
 builder.Services.AddSingleton<IAzureBlobService, AzureBlobService>();
