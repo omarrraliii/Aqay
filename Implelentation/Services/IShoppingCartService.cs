@@ -14,5 +14,6 @@ namespace aqay_apis.Services
         Task<bool> AddProductVariantAsync(int shoppingCartId, int productVariantId);
         Task<bool> RemoveProductVariantAsync(int shoppingCartId, int productVariantId);
         Task<IEnumerable<ProductVariant>> GetProductVariantsAsync(int shoppingCartId);
+
     }
 }

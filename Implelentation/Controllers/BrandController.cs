@@ -15,19 +15,6 @@ namespace aqay_apis.Controllers
         {
             _brandService = brandService;
         }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateBrand([FromBody] BrandDto brandDto)
-        {
-            if (brandDto == null)
-            {
-                return BadRequest("Brand data is null.");
-            }
-
-            var createdBrand = await _brandService.CreateBrandAsync(brandDto);
-            return CreatedAtAction(nameof(GetBrandById), new { id = createdBrand.Id }, createdBrand);
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBrandById(int id)
         {
@@ -40,26 +27,16 @@ namespace aqay_apis.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBrands([FromQuery] int pageIndex = 1)
+        public async Task<IActionResult> GetAllBrands(int pageIndex = 1)
         {
             var paginatedBrands = await _brandService.GetAllBrandsAsync(pageIndex);
             return Ok(paginatedBrands);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBrand(int id, [FromBody] BrandDto brandDto)
+        public async Task<IActionResult> UpdateBrand(int id, [FromForm] BrandDto brandDto)
         {
-            if (brandDto == null)
-            {
-                return BadRequest("Brand data is null.");
-            }
-
-            var updatedBrand = await _brandService.UpdateBrandAsync(id, brandDto);
-            if (updatedBrand == null)
-            {
-                return NotFound();
-            }
-
+            var updatedBrand = await _brandService.EditProfileAsync(id, brandDto);
             return Ok(updatedBrand);
         }
 

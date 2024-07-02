@@ -6,7 +6,7 @@ namespace aqay_apis.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime LastEdit { get; set; }
         public string? Tiktok { get; set; }
@@ -20,6 +20,7 @@ namespace aqay_apis.Models
         public ICollection<Product>? Products { get; set; }
         //one to one relationship with About
         public string? About { get; set; }
+        public string? LogoUrl { get; set; }
 
     }
 }

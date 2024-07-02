@@ -21,12 +21,14 @@ namespace aqay_apis.Services
         private readonly IMailingService _mailingService;
         private readonly UserManager<User> _userManager;
         private readonly GlobalVariables _globalVariables;
-        public AdminService(ApplicationDbContext context,GlobalVariables globalVariables, UserManager<User> userManager, IMailingService mailingService)
+        private readonly IBrandService _brandService;
+        public AdminService(ApplicationDbContext context,GlobalVariables globalVariables, UserManager<User> userManager, IMailingService mailingService, IBrandService brandService)
         {
             _context = context;
             _userManager = userManager;
             _mailingService = mailingService;
             _globalVariables = globalVariables;
+            _brandService = brandService;
         }
         public async Task<PaginatedResult<PendingMerchant>> ListAllPendingMerchantsAsync(int pageindex)
         {
@@ -64,10 +66,12 @@ namespace aqay_apis.Services
             var result = await _userManager.CreateAsync(newMerchant, pendingMerchant.Password);
             _context.Set<PendingMerchant>().Remove(pendingMerchant);
             await _context.SaveChangesAsync();
+
             // add the user to a role Owner Automatically
             await _userManager.AddToRoleAsync(newMerchant, "Owner");
             await _context.SaveChangesAsync();
-
+            // create a brand and link it with the accepted merchan
+            _brandService.CreateBrandAsync(newMerchant.Id);
             return "Merchant accepted Go to subscribe page";
         }
         public async Task<string> RejectMerchantAsync(int pendingMerchantId)

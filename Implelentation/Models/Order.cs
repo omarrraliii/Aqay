@@ -7,5 +7,7 @@ public class Order
     public double TotalPrice { get; set;}
     public DateTime CreatedOn { get; set;}
     public DateTime LastEdit { get; set; }
-    public bool IsAccepted { get; set;}
+    public bool IsAccepted { get; set;} = false;
+    public string ConsumerId { get; set;}
+    public int BrandId { get; set;}
 }
