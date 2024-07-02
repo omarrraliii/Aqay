@@ -41,6 +41,23 @@ namespace aqay_apis.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ORDERSTATUSES = table.Column<int>(type: "int", nullable: false),
+                    TotalPrice = table.Column<double>(type: "float", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastEdit = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsAccepted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PendingMerchants",
                 columns: table => new
                 {
@@ -50,7 +67,8 @@ namespace aqay_apis.Migrations
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NATID = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TRN = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    TRN = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BrandName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -202,25 +220,6 @@ namespace aqay_apis.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ShoppingCartId = table.Column<int>(type: "int", nullable: false),
-                    PAYMENTOPTIONS = table.Column<int>(type: "int", nullable: false),
-                    ORDERSTATUSES = table.Column<int>(type: "int", nullable: false),
-                    DeliveryFees = table.Column<double>(type: "float", nullable: false),
-                    TotalPrice = table.Column<double>(type: "float", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsAccepted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
@@ -233,7 +232,6 @@ namespace aqay_apis.Migrations
                     LastEdit = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
                     BrandId = table.Column<int>(type: "int", nullable: false),
-                    ShoppingCartId = table.Column<int>(type: "int", nullable: true),
                     WishListId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -340,6 +338,7 @@ namespace aqay_apis.Migrations
                     IsOwner = table.Column<bool>(type: "bit", nullable: true),
                     IsSubscriped = table.Column<bool>(type: "bit", nullable: true),
                     SubscriptionId = table.Column<int>(type: "int", nullable: true),
+                    BrandName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -407,7 +406,9 @@ namespace aqay_apis.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TotalPrice = table.Column<double>(type: "float", nullable: false),
-                    ConsumerId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    ConsumerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DeliveryFees = table.Column<double>(type: "float", nullable: false),
+                    ProductVariantIds = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -416,8 +417,7 @@ namespace aqay_apis.Migrations
                         name: "FK_ShoppingCarts_Users_ConsumerId",
                         column: x => x.ConsumerId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -548,12 +548,6 @@ namespace aqay_apis.Migrations
                 filter: "[BrandOwnerId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_ShoppingCartId",
-                table: "Orders",
-                column: "ShoppingCartId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Products_BrandId",
                 table: "Products",
                 column: "BrandId");
@@ -562,11 +556,6 @@ namespace aqay_apis.Migrations
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Products_ShoppingCartId",
-                table: "Products",
-                column: "ShoppingCartId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_WishListId",
@@ -609,8 +598,7 @@ namespace aqay_apis.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ShoppingCarts_ConsumerId",
                 table: "ShoppingCarts",
-                column: "ConsumerId",
-                unique: true);
+                column: "ConsumerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subscriptions_PlanId",
@@ -678,21 +666,6 @@ namespace aqay_apis.Migrations
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Orders_ShoppingCarts_ShoppingCartId",
-                table: "Orders",
-                column: "ShoppingCartId",
-                principalTable: "ShoppingCarts",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Products_ShoppingCarts_ShoppingCartId",
-                table: "Products",
-                column: "ShoppingCartId",
-                principalTable: "ShoppingCarts",
-                principalColumn: "Id");
-
-            migrationBuilder.AddForeignKey(
                 name: "FK_Products_WishLists_WishListId",
                 table: "Products",
                 column: "WishListId",
@@ -706,14 +679,6 @@ namespace aqay_apis.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_Brands_Users_BrandOwnerId",
                 table: "Brands");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_ShoppingCarts_Users_ConsumerId",
-                table: "ShoppingCarts");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Products_ShoppingCarts_ShoppingCartId",
-                table: "Products");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_Products_Brands_BrandId",
@@ -752,6 +717,9 @@ namespace aqay_apis.Migrations
                 name: "RoleClaims");
 
             migrationBuilder.DropTable(
+                name: "ShoppingCarts");
+
+            migrationBuilder.DropTable(
                 name: "UserClaims");
 
             migrationBuilder.DropTable(
@@ -780,9 +748,6 @@ namespace aqay_apis.Migrations
 
             migrationBuilder.DropTable(
                 name: "Plans");
-
-            migrationBuilder.DropTable(
-                name: "ShoppingCarts");
 
             migrationBuilder.DropTable(
                 name: "Brands");

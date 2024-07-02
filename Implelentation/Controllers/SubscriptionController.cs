@@ -44,12 +44,5 @@ namespace aqay_apis.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        [HttpGet("payment-options")]
-        public ActionResult<IEnumerable<PAYMENTOPTIONS>> GetAllPaymentOptions()
-        {
-            var options = _subscriptionService.GetAllPaymentOptions();
-            return Ok(options);
-        }
     }
 }

@@ -11,5 +11,6 @@ namespace aqay_apis.Models
         //one to one relationship
         public int? SubscriptionId { get; set; }
         public Subscription? Subscription { get; set; }
+        public string BrandName { get; set; }
     }
 }

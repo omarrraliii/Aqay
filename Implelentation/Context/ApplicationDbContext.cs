@@ -36,11 +36,6 @@ namespace aqay_apis.Context
                 .HasForeignKey<Review>(r => r.ConsumerId)
                 .OnDelete(DeleteBehavior.Restrict);
             builder.Entity<Consumer>()
-                .HasOne(s=>s.ShoppingCart)
-                .WithOne(s => s.Consumer)
-                .HasForeignKey<ShoppingCart>(s=>s.ConsumerId)
-                .OnDelete(DeleteBehavior.Restrict);
-            builder.Entity<Consumer>()
                 .HasOne(c => c.WishList)
                 .WithOne(w => w.Consumer)
                 .HasForeignKey<Consumer>(w => w.WishListId)

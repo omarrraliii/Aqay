@@ -58,19 +58,12 @@ namespace aqay_apis.Services
                 IsVerified = true,
                 IsOwner = true,
                 IsSubscriped = false,
+                BrandName = pendingMerchant.BrandName
             };
             // register the new Merchant  in the db
             var result = await _userManager.CreateAsync(newMerchant, pendingMerchant.Password);
             _context.Set<PendingMerchant>().Remove(pendingMerchant);
             await _context.SaveChangesAsync();
-
-            /*
-             * create brand 
-             * link brand to merchant
-             *  
-             */
-
-
             // add the user to a role Owner Automatically
             await _userManager.AddToRoleAsync(newMerchant, "Owner");
             await _context.SaveChangesAsync();

@@ -83,9 +83,6 @@ namespace aqay_apis.Services
             await _context.SaveChangesAsync();
             return subscription;
         }
-        public IEnumerable<PAYMENTOPTIONS> GetAllPaymentOptions()
-        {
-            return Enum.GetValues(typeof(PAYMENTOPTIONS)).Cast<PAYMENTOPTIONS>();
-        }
+        
     }
 }

@@ -1,0 +1,18 @@
+﻿using aqay_apis.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace aqay_apis.Services
+{
+    public interface IShoppingCartService
+    {
+        Task<int> CreateAsync();
+        Task<bool> SetConsumerIdAsync(int shoppingCartId, string consumerId);
+        Task<bool> DeleteAsync(int id);
+        Task<ShoppingCart> ReadByIdAsync(int id);
+        Task<IEnumerable<ShoppingCart>> ReadAllAsync();
+        Task<bool> AddProductVariantAsync(int shoppingCartId, int productVariantId);
+        Task<bool> RemoveProductVariantAsync(int shoppingCartId, int productVariantId);
+        Task<IEnumerable<ProductVariant>> GetProductVariantsAsync(int shoppingCartId);
+    }
+}

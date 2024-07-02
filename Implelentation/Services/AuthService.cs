@@ -20,7 +20,8 @@ namespace aqay_apis.Services
         private readonly ApplicationDbContext _context;
         private readonly IWishListService _wishListService;
         private readonly IMailingService _mailingService;
-        public AuthService(RoleManager<IdentityRole> roleManager,IMailingService mailingService,IWishListService wishListService ,IOptions<JWT> jwt, UserManager<User> userManager, ApplicationDbContext context)
+        private readonly IShoppingCartService _shoppingCartService;
+        public AuthService(RoleManager<IdentityRole> roleManager,IShoppingCartService shoppingCartService,IMailingService mailingService,IWishListService wishListService ,IOptions<JWT> jwt, UserManager<User> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -28,6 +29,7 @@ namespace aqay_apis.Services
             _context = context;
             _wishListService = wishListService;
             _mailingService = mailingService;
+            _shoppingCartService = shoppingCartService;
         }
         public async Task<AuthModel> LoginAsync(LoginModel model)
         {
@@ -54,7 +56,7 @@ namespace aqay_apis.Services
             }
 
             // Check if the user is a merchant and is subscribed
-            if (await _userManager.IsInRoleAsync(user, "Merchant"))
+            if (await _userManager.IsInRoleAsync(user, "Owner"))
             {
                 var merchant = await _context.Merchants.FindAsync(user.Id);
                 if (merchant == null) {
@@ -118,12 +120,22 @@ namespace aqay_apis.Services
             // add the user to a role consumer Automatically
             await  _userManager.AddToRoleAsync(consumer, "Consumer");
 
-            // create a wishlist and link it with the consumer
+            // Create a wishlist and link it with the consumer
             var wishList = await _wishListService.CreateWishListAsync(consumer);
             consumer.WishList = wishList;
             consumer.WishListId = wishList.Id;
             await _userManager.UpdateAsync(consumer);
             await _context.SaveChangesAsync();
+
+            // Create a shopping cart and link it with the consumer
+            var shoppingCartId = await _shoppingCartService.CreateAsync();
+            var shoppingCart = await _shoppingCartService.ReadByIdAsync(shoppingCartId);
+            consumer.ShoppingCarts = new List<ShoppingCart> { shoppingCart };
+            await _userManager.UpdateAsync(consumer);
+            await _context.SaveChangesAsync();
+
+            // Update the shopping cart with the consumer ID
+            await _shoppingCartService.SetConsumerIdAsync(shoppingCartId, consumer.Id);
 
             // Create a User Token to Login after SignUp
             var jwtSecurityToken = await CreateJwtToken(consumer);
@@ -203,7 +215,8 @@ namespace aqay_apis.Services
                 Email = model.Email,
                 Username = userName,
                 NATID = (NAT)? model.NationalId : null,
-                TRN = (TRN)? model.TaxRegistrationNumber : null
+                TRN = (TRN)? model.TaxRegistrationNumber : null,
+                BrandName = model.BrandName
             };
 
             // if the password and the password Confirm didn't match
@@ -251,7 +264,6 @@ namespace aqay_apis.Services
 
             return jwtSecurityToken;
         }
-
         public async Task<string> CreateAdminAsync(string email, string password)
         {
             if (await _userManager.FindByEmailAsync(email) is not null)

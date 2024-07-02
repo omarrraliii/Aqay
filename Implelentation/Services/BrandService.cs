@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using aqay_apis.Context;
+using Microsoft.AspNetCore.Identity;
 
 namespace aqay_apis
 {
@@ -10,15 +11,21 @@ namespace aqay_apis
     {
         private readonly ApplicationDbContext _context;
         private readonly GlobalVariables _globalVariables;
+        private readonly UserManager<User> _userManager;
 
-        public BrandService(ApplicationDbContext context, GlobalVariables globalVariables)
+        public BrandService(ApplicationDbContext context, UserManager<User> userManager,GlobalVariables globalVariables)
         {
             _context = context;
             _globalVariables = globalVariables;
+            _userManager = userManager;
         }
 
         public async Task<Brand> CreateBrandAsync(BrandDto brandDto)
         {
+            var merchant = _userManager.FindByIdAsync(brandDto.BrandOwnerId);
+            if (merchant == null) {
+                throw new Exception("Merchant not found");
+            }
             var brand = new Brand
             {
                 Name = brandDto.Name,

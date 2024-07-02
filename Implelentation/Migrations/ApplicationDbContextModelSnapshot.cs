@@ -265,6 +265,10 @@ namespace aqay_apis.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("BrandName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -404,28 +408,19 @@ namespace aqay_apis.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<double>("DeliveryFees")
-                        .HasColumnType("float");
-
                     b.Property<bool>("IsAccepted")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime>("LastEdit")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("ORDERSTATUSES")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PAYMENTOPTIONS")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ShoppingCartId")
                         .HasColumnType("int");
 
                     b.Property<double>("TotalPrice")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ShoppingCartId")
-                        .IsUnique();
 
                     b.ToTable("Orders");
                 });
@@ -508,9 +503,6 @@ namespace aqay_apis.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
-                    b.Property<int?>("ShoppingCartId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("WishListId")
                         .HasColumnType("int");
 
@@ -519,8 +511,6 @@ namespace aqay_apis.Migrations
                     b.HasIndex("BrandId");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("ShoppingCartId");
 
                     b.HasIndex("WishListId");
 
@@ -678,16 +668,21 @@ namespace aqay_apis.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ConsumerId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<double>("DeliveryFees")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ProductVariantIds")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("TotalPrice")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ConsumerId")
-                        .IsUnique();
+                    b.HasIndex("ConsumerId");
 
                     b.ToTable("ShoppingCarts");
                 });
@@ -810,6 +805,10 @@ namespace aqay_apis.Migrations
                 {
                     b.HasBaseType("aqay_apis.Models.User");
 
+                    b.Property<string>("BrandName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsOwner")
                         .HasColumnType("bit");
 
@@ -915,17 +914,6 @@ namespace aqay_apis.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("aqay_apis.Order", b =>
-                {
-                    b.HasOne("aqay_apis.ShoppingCart", "ShoppingCart")
-                        .WithOne("Order")
-                        .HasForeignKey("aqay_apis.Order", "ShoppingCartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ShoppingCart");
-                });
-
             modelBuilder.Entity("aqay_apis.Product", b =>
                 {
                     b.HasOne("aqay_apis.Models.Brand", "Brand")
@@ -939,10 +927,6 @@ namespace aqay_apis.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("aqay_apis.ShoppingCart", null)
-                        .WithMany("Products")
-                        .HasForeignKey("ShoppingCartId");
 
                     b.HasOne("aqay_apis.WishList", null)
                         .WithMany("Products")
@@ -986,10 +970,8 @@ namespace aqay_apis.Migrations
             modelBuilder.Entity("aqay_apis.ShoppingCart", b =>
                 {
                     b.HasOne("aqay_apis.Models.Consumer", "Consumer")
-                        .WithOne("ShoppingCart")
-                        .HasForeignKey("aqay_apis.ShoppingCart", "ConsumerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .WithMany("ShoppingCarts")
+                        .HasForeignKey("ConsumerId");
 
                     b.Navigation("Consumer");
                 });
@@ -1065,14 +1047,6 @@ namespace aqay_apis.Migrations
                     b.Navigation("WishLists");
                 });
 
-            modelBuilder.Entity("aqay_apis.ShoppingCart", b =>
-                {
-                    b.Navigation("Order")
-                        .IsRequired();
-
-                    b.Navigation("Products");
-                });
-
             modelBuilder.Entity("aqay_apis.Subscription", b =>
                 {
                     b.Navigation("Merchant");
@@ -1091,8 +1065,7 @@ namespace aqay_apis.Migrations
                     b.Navigation("Review")
                         .IsRequired();
 
-                    b.Navigation("ShoppingCart")
-                        .IsRequired();
+                    b.Navigation("ShoppingCarts");
                 });
 
             modelBuilder.Entity("aqay_apis.Models.Merchant", b =>
