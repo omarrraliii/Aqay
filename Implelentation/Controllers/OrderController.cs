@@ -14,19 +14,19 @@ namespace aqay_apis.Controllers
         {
             _orderService = orderService;
         }
-        [HttpGet("consumer/{consumerId}/orders")]
+        [HttpGet("consumer/orders/")]
         public async Task<IActionResult> GetOrdersByConsumerId(string consumerId, int pageNumber)
         {
             var result = await _orderService.GetOrdersByConsumerIdAsync(consumerId, pageNumber);
             return Ok(result);
         }
-        [HttpGet("merchant/{merchantId}/orders")]
-        public async Task<IActionResult> GetOrdersByMerchantId(int merchantId, int pageNumber)
+        [HttpGet("brand/orders/")]
+        public async Task<IActionResult> GetOrdersByMerchantId(int brandId, int pageNumber)
         {
-            var result = await _orderService.GetOrdersByMerchantIdAsync(merchantId, pageNumber);
+            var result = await _orderService.GetOrdersByMerchantIdAsync(brandId, pageNumber);
             return Ok(result);
         }
-        [HttpGet("{id}")]
+        [HttpGet("id/")]
         public async Task<IActionResult> GetOrderById(int id)
         {
             var order = await _orderService.GetOrderByIdAsync(id);
@@ -36,7 +36,7 @@ namespace aqay_apis.Controllers
             }
             return Ok(order);
         }
-        [HttpPut("{orderId}/status")]
+        [HttpPut("order/status/")]
         public async Task<IActionResult> ChangeOrderStatus(int orderId, ORDERSTATUSES newStatus)
         {
             var result = await _orderService.ChangeOrderStatusAsync(orderId, newStatus);
@@ -46,13 +46,7 @@ namespace aqay_apis.Controllers
             }
             return Ok();
         }
-        [HttpPost("consumer/{consumerId}/product/{productId}/order")]
-        public async Task<IActionResult> CreateOrder(string consumerId, int productId)
-        {
-            var order = await _orderService.CreateOrderAsync(consumerId, productId);
-            return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
-        }
-        [HttpPost("{orderId}/accept")]
+        [HttpPost("order/accept/")]
         public async Task<IActionResult> AcceptOrder(int orderId)
         {
             var result = await _orderService.AcceptOrderAsync(orderId);
@@ -62,13 +56,13 @@ namespace aqay_apis.Controllers
             }
             return Ok();
         }
-        [HttpGet("merchant/{brandId}/orders/status/{status}")]
+        [HttpGet("brand/brand/orders/status/")]
         public async Task<IActionResult> GetOrdersByMerchantAndStatus(int brandId, ORDERSTATUSES status, int pageNumber)
         {
             var result = await _orderService.GetOrdersByMerchantAndStatusAsync(brandId, status, pageNumber);
             return Ok(result);
         }
-        [HttpGet("consumer/{consumerId}/orderHistory/status/{status}")]
+        [HttpGet("consumer/orderHistory/status/{status}")]
         public async Task<IActionResult> GetOrderHistoryByConsumerId(string consumerId, ORDERSTATUSES status, int pageNumber)
         {
             var result = await _orderService.GetOrderHistoryByConsumerIdAsync(consumerId, status, pageNumber);
@@ -81,11 +75,11 @@ namespace aqay_apis.Controllers
             return Ok(promoCode);
         }
         [HttpPost("checkout")]
-        public async Task<ActionResult<bool>> Checkout(int ShoppingCartId, string PromoCode)
+        public async Task<ActionResult<bool>> Checkout(int ShoppingCartId, string? PromoCode, string address)
         {
             try
             {
-                var result = await _orderService.CheckoutAsync(ShoppingCartId,PromoCode);
+                var result = await _orderService.CheckoutAsync(ShoppingCartId,PromoCode, address);
                 return Ok(result);
             }
             catch (Exception ex)

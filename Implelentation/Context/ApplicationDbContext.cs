@@ -29,7 +29,6 @@ namespace aqay_apis.Context
             builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
 
 
-
             builder.Entity<Consumer>()
                 .HasOne(c => c.Review)
                 .WithOne(r => r.Consumer)

@@ -83,10 +83,11 @@ namespace aqay_apis.Services
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<Order> CreateOrderAsync(string consumerId, int productId)
+        public async Task<Order> CreateOrderAsync(string consumerId, int productVariantId, string address)
         {
-            var productVariant = await _context.ProductVariants.FindAsync(productId);
+            var productVariant = await _context.ProductVariants.FindAsync(productVariantId);
             var product = await _context.Products.FindAsync(productVariant.ProductId);
+            var consumer = await _context.Users.FindAsync(consumerId);
             var newOrder = new Order
             {
                 ConsumerId = consumerId,
@@ -94,11 +95,15 @@ namespace aqay_apis.Services
                 ORDERSTATUSES = ORDERSTATUSES.PENDING,
                 CreatedOn = DateTime.Now,
                 LastEdit = DateTime.Now,
-                BrandId = product.BrandId
+                BrandId = product.BrandId,
+                ProductVariantId = productVariantId,
+                Address = address,
+                productName = product.Name,
+                ConsumerName = consumer.UserName
+
             };
             _context.Orders.Add(newOrder);
             await _context.SaveChangesAsync();
-
             return newOrder;
         }
         public async Task<bool> AcceptOrderAsync(int orderId)
@@ -181,7 +186,7 @@ namespace aqay_apis.Services
                 throw new Exception("Promo code has expired.");
             }
 
-            double newPrice;
+            double newPrice = 0;
             if (promoCode.Percentage != 0)
             {
                 newPrice = productPrice - (productPrice * (promoCode.Percentage / 100));
@@ -200,11 +205,10 @@ namespace aqay_apis.Services
             }
             return newPrice;
         }
-
-        public async Task<bool> CheckoutAsync(int shoppingCartId, string promoCode)
+        public async Task<bool> CheckoutAsync(int shoppingCartId, string promoCode, string address)
         {
             // Get shopping cart by id
-            var shoppingCart = await _context.ShoppingCarts.Include(sc => sc.ProductVariantIds).FirstOrDefaultAsync(sc => sc.Id == shoppingCartId);
+            var shoppingCart = await _context.ShoppingCarts.FindAsync(shoppingCartId);
             if (shoppingCart == null)
             {
                 throw new Exception("Shopping cart not found.");
@@ -217,20 +221,19 @@ namespace aqay_apis.Services
             }
             // Get consumer id from the shopping cart
             var consumerId = shoppingCart.ConsumerId;
-            if (consumerId == null) {
-                throw new Exception("Consumer not found.");
-            }
+
+            IList<int> productVariantsIds = shoppingCart.ProductVariantIds;
+
             // Loop over each product variant inside the shopping cart and create an order with it
-            foreach (var productVariantId in shoppingCart.ProductVariantIds)
+            foreach (var productVariantId in productVariantsIds)
             {
-                var order = await CreateOrderAsync(consumerId, productVariantId);
+                var order = await CreateOrderAsync(consumerId, productVariantId,address);
 
                 if (promoCodeEntity != null)
                 {
                     var newPrice = await ApplyPromoCodeAsync(promoCode, order.TotalPrice);
                     order.TotalPrice = newPrice;
                 }
-
                 _context.Orders.Update(order);
             }
             // Remove the shopping cart
@@ -241,7 +244,7 @@ namespace aqay_apis.Services
             {
                 ConsumerId = consumerId,
                 TotalPrice = 0,
-                DeliveryFees = 0
+                DeliveryFees = 0 // to be editied after address
             };
             _context.ShoppingCarts.Add(newShoppingCart);
 

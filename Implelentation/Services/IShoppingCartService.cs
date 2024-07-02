@@ -10,10 +10,10 @@ namespace aqay_apis.Services
         Task<bool> SetConsumerIdAsync(int shoppingCartId, string consumerId);
         Task<bool> DeleteAsync(int id);
         Task<ShoppingCart> ReadByIdAsync(int id);
-        Task<IEnumerable<ShoppingCart>> ReadAllAsync();
+        Task<ICollection<ShoppingCart>> ReadAllAsync();
         Task<bool> AddProductVariantAsync(int shoppingCartId, int productVariantId);
         Task<bool> RemoveProductVariantAsync(int shoppingCartId, int productVariantId);
-        Task<IEnumerable<ProductVariant>> GetProductVariantsAsync(int shoppingCartId);
+        Task<IList<ProductVariant>> GetProductVariantsAsync(int shoppingCartId);
 
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using aqay_apis.Context;
 
@@ -11,9 +12,11 @@ using aqay_apis.Context;
 namespace aqay_apis.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240702193405_EditShoppingCart")]
+    partial class EditShoppingCart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -407,18 +410,10 @@ namespace aqay_apis.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("BrandId")
                         .HasColumnType("int");
 
                     b.Property<string>("ConsumerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConsumerName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -434,15 +429,8 @@ namespace aqay_apis.Migrations
                     b.Property<int>("ORDERSTATUSES")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductVariantId")
-                        .HasColumnType("int");
-
                     b.Property<double>("TotalPrice")
                         .HasColumnType("float");
-
-                    b.Property<string>("productName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -692,8 +680,7 @@ namespace aqay_apis.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ConsumerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<double>("DeliveryFees")
                         .HasColumnType("float");
@@ -706,6 +693,8 @@ namespace aqay_apis.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ConsumerId");
 
                     b.ToTable("ShoppingCarts");
                 });
@@ -990,6 +979,15 @@ namespace aqay_apis.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("aqay_apis.ShoppingCart", b =>
+                {
+                    b.HasOne("aqay_apis.Models.Consumer", "Consumer")
+                        .WithMany("ShoppingCarts")
+                        .HasForeignKey("ConsumerId");
+
+                    b.Navigation("Consumer");
+                });
+
             modelBuilder.Entity("aqay_apis.Subscription", b =>
                 {
                     b.HasOne("aqay_apis.Plan", "Plan")
@@ -1078,6 +1076,8 @@ namespace aqay_apis.Migrations
                 {
                     b.Navigation("Review")
                         .IsRequired();
+
+                    b.Navigation("ShoppingCarts");
                 });
 
             modelBuilder.Entity("aqay_apis.Models.Merchant", b =>

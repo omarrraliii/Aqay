@@ -130,8 +130,8 @@ namespace aqay_apis.Services
             // Create a shopping cart and link it with the consumer
             var shoppingCartId = await _shoppingCartService.CreateAsync();
             var shoppingCart = await _shoppingCartService.ReadByIdAsync(shoppingCartId);
-            consumer.ShoppingCarts = new List<ShoppingCart> { shoppingCart };
-            await _userManager.UpdateAsync(consumer);
+            shoppingCart.ConsumerId = consumer.Id;
+            _context.Update(shoppingCart);
             await _context.SaveChangesAsync();
 
             // Update the shopping cart with the consumer ID
@@ -202,7 +202,7 @@ namespace aqay_apis.Services
             {
                 // send data to consumer
                 var info = NationalIDValidator.ExtractFormattedInfo(model.NationalId);
-                await _mailingService.SendEmailAsync(model.Email, "Data check", info, null);
+                //await _mailingService.SendEmailAsync(model.Email, "Data check", info, null);
             }
             // Extract username from email
             string[] emailParts = model.Email.Split('@');

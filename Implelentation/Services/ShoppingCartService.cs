@@ -15,7 +15,6 @@ namespace aqay_apis.Services
             {
                 TotalPrice = 0,
                 ConsumerId = null,
-                Consumer = null,
                 DeliveryFees = 0,
                 ProductVariantIds = new List<int>()
             };
@@ -47,7 +46,7 @@ namespace aqay_apis.Services
         {
             return await _context.ShoppingCarts.FindAsync(id);
         }
-        public async Task<IEnumerable<ShoppingCart>> ReadAllAsync()
+        public async Task<ICollection<ShoppingCart>> ReadAllAsync()
         {
             return await _context.ShoppingCarts.ToListAsync();
         }
@@ -77,18 +76,24 @@ namespace aqay_apis.Services
             }
             return false;
         }
-        public async Task<IEnumerable<ProductVariant>> GetProductVariantsAsync(int shoppingCartId)
+        public async Task<IList<ProductVariant>> GetProductVariantsAsync(int shoppingCartId)
         {
-            var shoppingCart = await _context.ShoppingCarts
-                .Include(sc => sc.ProductVariantIds)
-                .FirstOrDefaultAsync(sc => sc.Id == shoppingCartId);
 
-            if (shoppingCart == null) return null;
-
-            var productVariants = await _context.ProductVariants
-                .Where(pv => shoppingCart.ProductVariantIds.Contains(pv.Id))
-                .ToListAsync();
-
+            // retrive cart object
+            var cart = await _context.ShoppingCarts.FindAsync(shoppingCartId);
+            IList<int> productVariantsIds = cart.ProductVariantIds;
+        
+            if (cart == null) return null;
+            IList<ProductVariant> productVariants = new List<ProductVariant>();
+            foreach (var id in productVariantsIds)
+            {
+                var variant = await _context.ProductVariants.FindAsync(id);
+                if (variant!= null)
+                {
+                    productVariants.Add(variant);
+                }
+                
+            }
             return productVariants;
         }
     }
