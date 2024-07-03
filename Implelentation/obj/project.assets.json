@@ -8445,11 +8445,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "f:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj",
+      "projectUniqueName": "F:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj",
       "projectName": "aqay_apis",
-      "projectPath": "f:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj",
+      "projectPath": "F:\\Aqay project\\Aqay\\Implelentation\\aqay_apis.csproj",
       "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-      "outputPath": "f:\\Aqay project\\Aqay\\Implelentation\\obj\\",
+      "outputPath": "F:\\Aqay project\\Aqay\\Implelentation\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config"
