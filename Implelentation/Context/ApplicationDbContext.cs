@@ -1,9 +1,22 @@
 ﻿
 using aqay_apis.Models;
+using Humanizer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Build.Evaluation;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Interfaces;
+using Org.BouncyCastle.Bcpg.Sig;
+using System.Numerics;
+using System;
 using System.Reflection.Emit;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Runtime.ConstrainedExecution;
+using System.Threading.Channels;
 
 namespace aqay_apis.Context
 {
@@ -27,28 +40,18 @@ namespace aqay_apis.Context
             builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
             builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
             builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
-
-
-            /*
-             * builder.Entity<Consumer>()
-                .HasOne(c => c.Review)
-                .WithOne(r => r.Consumer)
-                .HasForeignKey<Review>(r => r.ConsumerId)
-                .OnDelete(DeleteBehavior.Restrict);
-             */
             builder.Entity<Consumer>()
-                .HasOne(c => c.WishList)
-                .WithOne(w => w.Consumer)
-                .HasForeignKey<Consumer>(w => w.WishListId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+            .HasOne(c => c.WishList)
+            .WithOne(w => w.Consumer)
+            .HasForeignKey<Consumer>(w => w.WishListId)
+            .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Plan>().HasData(
-               new Plan { Id = 1, Name = "Monthly", Describtion = "Monthly subscription", Price = 9.99 },
-               new Plan { Id = 2, Name = "Quarterly", Describtion = "Quarterly subscription", Price = 27.99 },
-               new Plan { Id = 3, Name = "Yearly", Describtion = "Yearly subscription", Price = 99.99 }
-           );
-
+            new Plan { Id = 1, Name = "Annual subscription", Describtion= "Annual Subscription plan,merchants gain full access to our e - commerce platform for a whole year.", Price = 3600 },
+            new Plan { Id = 2, Name = "Quarterly subscription", Describtion = "Our Quarterly Subscription plan provides merchants with a balance between commitment and flexibility.", Price = 1500 },
+            new Plan { Id = 3, Name = "Monthly subscription", Describtion = "Our Monthly Subscription plan offers the flexibility of paying on a monthly basis.", Price = 600 }
+            );
+            
             builder.Entity<Subscription>().HasData(
             new Subscription
             {
@@ -57,8 +60,7 @@ namespace aqay_apis.Context
                 EndDate = new DateTime(2024, 1, 1),
                 PlanId = 1
             }
-        );
-
+            );
         }
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<Brand> Brands { get; set; }

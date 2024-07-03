@@ -71,9 +71,9 @@ namespace aqay_apis.Services
                 StartDate = DateTime.Now,
                 EndDate = plan.Name switch
                 {
-                    "Monthly" => DateTime.Now.AddMonths(1),
-                    "Quarterly" => DateTime.Now.AddMonths(3),
-                    "Yearly" => DateTime.Now.AddYears(1),
+                    "Monthly subscription" => DateTime.Now.AddMonths(1),
+                    "Quarterly subscription" => DateTime.Now.AddMonths(3),
+                    "Annual subscription" => DateTime.Now.AddYears(1),
                     _ => throw new Exception("Invalid plan type.")
                 },
                 PlanId = plan.Id,

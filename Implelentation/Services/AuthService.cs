@@ -106,6 +106,7 @@ namespace aqay_apis.Services
                 Email = model.Email,
                 UserName = userName,
                 Gender = model.Gender,
+                DateOfBirth = model.DateOfBirth,
             };
             // if the password and the password Confirm didn't match
             if (model.Password != model.PasswordConfirm)
