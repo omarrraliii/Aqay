@@ -117,7 +117,5 @@ namespace aqay_apis.Services
             
         }
 
-
-
     }
 }

@@ -18,8 +18,16 @@ namespace aqay_apis.Controllers
         [HttpPost]
         public async Task<ActionResult<Review>> ReviewOrder(ReviewDto review)
         {
-            var result = await _reviewService.ReviewProductAsync(review);
-            return Ok(result);
+            try
+            {
+                var result = await _reviewService.ReviewProductAsync(review);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
+
     }
 }

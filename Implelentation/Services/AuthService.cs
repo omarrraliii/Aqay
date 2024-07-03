@@ -216,7 +216,8 @@ namespace aqay_apis.Services
                 Username = userName,
                 NATID = (NAT)? model.NationalId : null,
                 TRN = (TRN)? model.TaxRegistrationNumber : null,
-                BrandName = model.BrandName
+                BrandName = model.BrandName,
+                phoneNumber = model.PhoneNumber
             };
 
             // if the password and the password Confirm didn't match
