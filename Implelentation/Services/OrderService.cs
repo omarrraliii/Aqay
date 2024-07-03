@@ -96,9 +96,10 @@ namespace aqay_apis.Services
                 CreatedOn = DateTime.Now,
                 LastEdit = DateTime.Now,
                 BrandId = product.BrandId,
+                BrandName=product.Brand.Name,
                 ProductVariantId = productVariantId,
                 Address = address,
-                productName = product.Name,
+                ProductName = product.Name,
                 ConsumerName = consumer.UserName
 
             };

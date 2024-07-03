@@ -150,5 +150,15 @@ namespace aqay_apis.Services
                 HasMoreItems = (pageIndex * _globalVariables.PageSize) < totalCount
             };
         }
+
+        public async Task<string> GetEmailByUserIDAsync(string id)
+        {
+            var user=await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return null;
+            }
+            return user.Email;
+        }
     }
 }

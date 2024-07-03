@@ -7,9 +7,11 @@ namespace aqay_apis;
 public class ReportsController: ControllerBase
 {
     private readonly IReportService _reportService;
-    public ReportsController(IReportService reportService)
+    private readonly IAdminService _adminService;
+    public ReportsController(IReportService reportService,IAdminService adminService)
     {
         _reportService = reportService;
+        _adminService = adminService;
     }
     [HttpPost]
     public async Task<IActionResult> CreateReport(string title,string intiatorId, string description)
@@ -78,4 +80,14 @@ public class ReportsController: ControllerBase
         }
         return NotFound();
     }
+    [HttpGet("GetEmailByUserId")]
+    public async Task<IActionResult> GetEmailByUserId (string id)
+        {
+            var email=await _adminService.GetEmailByUserIDAsync(id);
+            if (email == null)
+            {
+                return NotFound();
+            }
+            return Ok(email);
+        }
 }

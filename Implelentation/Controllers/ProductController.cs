@@ -23,9 +23,9 @@ namespace aqay_apis.Controllers
             _context = context;
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(int pageSize = 10, int pageNumber = 1)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(int pageIndex = 1)
         {
-            var products = await _productService.GetAllAsync(pageSize, pageNumber);
+            var products = await _productService.GetAllAsync(pageIndex);
             return Ok(products);
         }
         [HttpGet("id/")]
@@ -140,11 +140,11 @@ namespace aqay_apis.Controllers
         }
         /// productttt
         [HttpGet("variants/")]
-        public async Task<ActionResult<IEnumerable<ProductVariant>>> GetProductVariants(int productId)
+        public async Task<ActionResult<IEnumerable<ProductVariant>>> GetProductVariants(int productId,int pageIndex=1)
         {
             try
             {
-                var variants = await _productService.GetProductSpecsAsync(productId);
+                var variants = await _productService.GetProductSpecsAsync(productId,pageIndex);
                 return Ok(variants);
             }
             catch (Exception ex)
@@ -153,16 +153,29 @@ namespace aqay_apis.Controllers
             }
         }
         [HttpGet("brand/")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByBrand(int brandId, int pageSize = 10, int pageNumber = 1)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByBrand(int brandId, int pageIndex = 1)
         {
-            var products = await _productService.GetProductsByBrandAsync(brandId, pageSize, pageNumber);
+            var products = await _productService.GetProductsByBrandAsync(brandId, pageIndex);
             return Ok(products);
         }
         [HttpGet("category/")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(int categoryId, int pageSize = 10, int pageNumber = 1)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(int categoryId, int pageIndex = 1)
         {
-            var products = await _productService.GetProductsByCategoryAsync(categoryId, pageSize, pageNumber);
+            var products = await _productService.GetProductsByCategoryAsync(categoryId, pageIndex);
             return Ok(products);
+        }
+        [HttpGet("name/")]
+        public async Task<ActionResult<PaginatedResult<ProductDto>>> GetProductsByName(string name, int pageIndex = 1)
+        {
+            var result = await _productService.GetProductsByName(name, pageIndex);
+            return Ok(result);
+        }
+
+        [HttpGet("tag/")]
+        public async Task<ActionResult<PaginatedResult<ProductDto>>> GetProductsByTag(string tag, int pageIndex = 1)
+        {
+            var result = await _productService.GetProductsByTag(tag, pageIndex);
+            return Ok(result);
         }
     }
 }

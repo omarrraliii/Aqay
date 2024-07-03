@@ -10,6 +10,7 @@ public class FAQController:ControllerBase
     {
         _faqService = fAQService;
     }
+    [HttpGet("GetAllFAQ")]
     public async Task<IActionResult> GetAllFAQs(int pageIndex)
     {
         var FAQs=await _faqService.GetAllFAQs(pageIndex);
@@ -19,6 +20,7 @@ public class FAQController:ControllerBase
         }
         return Ok(FAQs);
     }
+    [HttpGet("GetFAQById")]
     public async Task<IActionResult> GetFAQById(int id)
     {
         var FAQ=await _faqService.GetFAQById(id);
@@ -28,6 +30,7 @@ public class FAQController:ControllerBase
         }
         return Ok(FAQ);
     }
+    [HttpPost("Create")]
     public async Task<IActionResult> CreateFAQ(string question,string answer)
     {
         try
@@ -41,6 +44,7 @@ public class FAQController:ControllerBase
         }
         
     }
+    [HttpPut("Update")]
     public async Task<IActionResult> UpdateFAQ(int id,string question,string answer)
     {
         var FAQ=await _faqService.UpdateFAQ(id,question,answer);
@@ -50,6 +54,7 @@ public class FAQController:ControllerBase
         }
         return Ok(FAQ);
     }
+    [HttpDelete]
     public async Task<IActionResult> DeleteFAQ(int id)
     {
         var FAQ=await _faqService.DeleteFAQ(id);
@@ -59,6 +64,7 @@ public class FAQController:ControllerBase
         }
         return NotFound();
     }
+    [HttpGet("Search")]
     public async Task<IActionResult> SearchFAQs(string query)
     {
         var FAQs = await _faqService.SearchFAQs(query);

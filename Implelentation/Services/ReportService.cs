@@ -44,10 +44,10 @@ public class ReportService:IReportService
         }
         return report;
     }
-    public async Task<Report> GetReportByTitleAsync (string title)
+    public async Task<IEnumerable<Report>> GetReportByTitleAsync (string title)
     {
-        title=title.ToLower();
-        var report = await _context.Reports.FirstOrDefaultAsync(t=>t.Title == title);
+        var report = await _context.Reports.Where(t=>EF.Functions.Like(t.Title,$"%{title}%"))
+                                            .ToListAsync();
         if (report == null)
         {
             throw new Exception ($"Failed to find report with title {title}");
