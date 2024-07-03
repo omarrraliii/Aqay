@@ -10,7 +10,6 @@
         public string PostalCode { get; set; }
         public string Country { get; set; }
         public DateOnly DateOfBirth { get; set; }
-        public Review Review{ get; set; }
         public WishList WishList { get; set; }
         public int? WishListId { get; set; } 
     }

@@ -8,6 +8,7 @@ public class Order
     public DateTime CreatedOn { get; set;}
     public DateTime LastEdit { get; set; }
     public bool IsAccepted { get; set;} = false;
+    public bool IsReviewed { get; set; } = false;
     public string ConsumerId { get; set;}
     public int ProductVariantId { get; set;}
     public string ProductName { get; set;}

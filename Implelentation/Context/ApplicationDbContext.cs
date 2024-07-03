@@ -29,11 +29,13 @@ namespace aqay_apis.Context
             builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
 
 
-            builder.Entity<Consumer>()
+            /*
+             * builder.Entity<Consumer>()
                 .HasOne(c => c.Review)
                 .WithOne(r => r.Consumer)
                 .HasForeignKey<Review>(r => r.ConsumerId)
                 .OnDelete(DeleteBehavior.Restrict);
+             */
             builder.Entity<Consumer>()
                 .HasOne(c => c.WishList)
                 .WithOne(w => w.Consumer)

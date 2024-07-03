@@ -9,5 +9,6 @@
         public string NATID { get; set; }
         public string? TRN { get; set; }
         public string BrandName { get; set; }
+        public string phoneNumber { get; set; }
     }
 }
