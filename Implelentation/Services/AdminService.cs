@@ -21,12 +21,14 @@ namespace aqay_apis.Services
         private readonly IMailingService _mailingService;
         private readonly UserManager<User> _userManager;
         private readonly GlobalVariables _globalVariables;
-        public AdminService(ApplicationDbContext context,GlobalVariables globalVariables, UserManager<User> userManager, IMailingService mailingService)
+        private readonly IBrandService _brandService;
+        public AdminService(ApplicationDbContext context,GlobalVariables globalVariables, UserManager<User> userManager, IMailingService mailingService, IBrandService brandService)
         {
             _context = context;
             _userManager = userManager;
             _mailingService = mailingService;
             _globalVariables = globalVariables;
+            _brandService = brandService;
         }
         public async Task<PaginatedResult<PendingMerchant>> ListAllPendingMerchantsAsync(int pageindex)
         {
@@ -49,7 +51,7 @@ namespace aqay_apis.Services
             {
                 return "Pending merchant not found";
             }
-            await _mailingService.SendEmailAsync(pendingMerchant.Email, "Merchant Accepted", "Now Subscribe and Create your Own Brand", null);
+            //await _mailingService.SendEmailAsync(pendingMerchant.Email, "Merchant Accepted", "Now Subscribe and Create your Own Brand", null);
 
             var newMerchant = new Merchant
             {
@@ -58,23 +60,23 @@ namespace aqay_apis.Services
                 IsVerified = true,
                 IsOwner = true,
                 IsSubscriped = false,
+                BrandName = pendingMerchant.BrandName
             };
             // register the new Merchant  in the db
             var result = await _userManager.CreateAsync(newMerchant, pendingMerchant.Password);
-            _context.Set<PendingMerchant>().Remove(pendingMerchant);
-            await _context.SaveChangesAsync();
 
-            /*
-             * create brand 
-             * link brand to merchant
-             *  
-             */
-
+            
+            //await _context.SaveChangesAsync();
 
             // add the user to a role Owner Automatically
             await _userManager.AddToRoleAsync(newMerchant, "Owner");
             await _context.SaveChangesAsync();
 
+            // create a brand and link it with the accepted merchan
+            await _brandService.CreateBrandAsync(newMerchant.Id);
+            
+            _context.Set<PendingMerchant>().Remove(pendingMerchant);
+            await _context.SaveChangesAsync();
             return "Merchant accepted Go to subscribe page";
         }
         public async Task<string> RejectMerchantAsync(int pendingMerchantId)
@@ -87,7 +89,7 @@ namespace aqay_apis.Services
 
             _context.Set<PendingMerchant>().Remove(pendingMerchant);
             await _context.SaveChangesAsync();
-            await _mailingService.SendEmailAsync(pendingMerchant.Email, "Merchant Rejected", "Sorry, You have been rejected as a merchant as AQAY\nCheck Tech support for rejection reasons",null);
+            //await _mailingService.SendEmailAsync(pendingMerchant.Email, "Merchant Rejected", "Sorry, You have been rejected as a merchant as AQAY\nCheck Tech support for rejection reasons",null);
             return "Merchant rejected";
         }
         public async Task<string> ToggleActivityAsync(string id)

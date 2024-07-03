@@ -1,6 +1,7 @@
 ﻿using System.Collections;
+using System.Collections.ObjectModel;
 using aqay_apis.Models;
-
+using System.Collections.Generic;
 namespace aqay_apis;
 
 public class ShoppingCart
@@ -8,8 +9,6 @@ public class ShoppingCart
     public int Id { get; set;}
     public double TotalPrice { get; set;}
     public string ConsumerId { get; set;}
-    public Consumer Consumer{ get; set; } //should change it to one to many
-    public Order Order { get; set; }
-
-    public ICollection<Product> Products { get; set;}
+    public double DeliveryFees { get; set; }
+    public IList<int> ProductVariantIds { get; set; } = new List<int>();
 }

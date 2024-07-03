@@ -46,6 +46,8 @@ builder.Services.AddScoped<IBrandService,BrandService>();
 builder.Services.AddScoped<ITagService,TagService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 // Introduce Azure Blob Service 
 builder.Services.AddSingleton<IAzureBlobService, AzureBlobService>();
