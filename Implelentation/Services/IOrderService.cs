@@ -17,6 +17,6 @@ namespace aqay_apis.Services
         Task<double> ApplyPromoCodeAsync(string promoCode, double productPrice);
         Task<PromoCode> CreatePromoCodeAsync(PromoCodeDto promoCodeDto);
         Task<bool> CheckoutAsync(int shoppingCartId, string promoCode, string address);
-
+    
     }
 }

@@ -8,6 +8,7 @@ using System.Text;
 using aqay_apis.Context;
 using aqay_apis.Models;
 using aqay_apis;
+using aqay_apis.Dashboards;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,9 @@ builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IFAQService,FAQService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+
+// dashboard services
+builder.Services.AddScoped<MerchantDashboardService>();
 
 // Introduce Azure Blob Service 
 builder.Services.AddSingleton<IAzureBlobService, AzureBlobService>();

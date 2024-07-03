@@ -62,7 +62,6 @@ namespace aqay_apis.Context
             }
             );
         }
-        public DbSet<Wallet> Wallets { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Tag> Tags { get; set; }

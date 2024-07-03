@@ -100,7 +100,8 @@ namespace aqay_apis.Services
                 ProductVariantId = productVariantId,
                 Address = address,
                 ProductName = product.Name,
-                ConsumerName = consumer.UserName
+                ConsumerName = consumer.UserName,
+                ConsumerGender = consumer.Gender
 
             };
             _context.Orders.Add(newOrder);

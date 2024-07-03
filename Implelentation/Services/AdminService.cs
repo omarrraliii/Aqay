@@ -51,34 +51,64 @@ namespace aqay_apis.Services
             {
                 return "Pending merchant not found";
             }
-            //await _mailingService.SendEmailAsync(pendingMerchant.Email, "Merchant Accepted", "Now Subscribe and Create your Own Brand", null);
 
+            // Check if there is already a user with the same email
+            if (await _userManager.FindByEmailAsync(pendingMerchant.Email) != null)
+            {
+                return "Email is already registered!";
+            }
+
+            // Extract username from email
+            string[] emailParts = pendingMerchant.Email.Split('@');
+            string userName = emailParts[0];
+
+            // Create a new Merchant object
             var newMerchant = new Merchant
             {
                 Email = pendingMerchant.Email,
-                UserName = pendingMerchant.Username,
+                UserName = userName,
                 IsVerified = true,
                 IsOwner = true,
                 IsSubscriped = false,
-                BrandName = pendingMerchant.BrandName
+                BrandName = pendingMerchant.BrandName,
+                PhoneNumber = pendingMerchant.phoneNumber
             };
-            // register the new Merchant  in the db
+
+            // Attempt to create the new user
             var result = await _userManager.CreateAsync(newMerchant, pendingMerchant.Password);
+            if (!result.Succeeded)
+            {
+                return "Failed to create merchant. Please try again.";
+            }
 
-            
-            //await _context.SaveChangesAsync();
-
-            // add the user to a role Owner Automatically
+            // Add the user to the "Owner" role
             await _userManager.AddToRoleAsync(newMerchant, "Owner");
-            await _context.SaveChangesAsync();
 
-            // create a brand and link it with the accepted merchan
-            await _brandService.CreateBrandAsync(newMerchant.Id);
-            
+            // Create a brand and link it with the accepted merchant
+            var brand = await _brandService.CreateBrandAsync(newMerchant.Id);
+
+            // Update the new merchant with the created brand
+            newMerchant.Brand = brand;
+            await _userManager.UpdateAsync(newMerchant);
+
+            // Remove the pending merchant from the context
             _context.Set<PendingMerchant>().Remove(pendingMerchant);
-            await _context.SaveChangesAsync();
-            return "Merchant accepted Go to subscribe page";
+
+            try
+            {
+                // Save changes to the database
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Handle specific database update exceptions here
+                // Log or handle the exception as needed
+                return "An error occurred while saving changes.";
+            }
+
+            return "Merchant accepted. Proceed to the subscription page.";
         }
+
         public async Task<string> RejectMerchantAsync(int pendingMerchantId)
         {
             var pendingMerchant = await _context.Set<PendingMerchant>().FindAsync(pendingMerchantId);
