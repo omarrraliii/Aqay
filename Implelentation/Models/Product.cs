@@ -11,7 +11,8 @@ public class Product
     public string Description { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime LastEdit { get; set; }
-    public int Rate { get; set; }
+    public int Rate { get; set; } = 0;
+    public int ReviewCount { get; set; } = 0;
 
     //many to many relationship with Tags
     public ICollection<Tag> Tags{ get; set; }
