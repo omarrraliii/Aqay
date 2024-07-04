@@ -15,12 +15,20 @@ namespace aqay_apis.Services
             _globalVariable = globalVariable;
         }
         // Read all categories as 10 categories by page
-        public async Task<IEnumerable<Category>> getCategories(int page)
+        public async Task<PaginatedResult<Category>> getCategories(int page)
         {
-            return await _context.Categories
+            var categories= await _context.Categories
                                  .Skip((page - 1) * _globalVariable.PageSize)
                                  .Take(_globalVariable.PageSize)
                                  .ToListAsync();
+            var categorieCount= await _context.Categories.CountAsync();
+            var paginatedResult=new PaginatedResult<Category>
+            {
+                Items=categories,
+                TotalCount=categorieCount,
+                HasMoreItems=page*_globalVariable.PageSize<categorieCount
+            };
+            return paginatedResult;
         }
         // Read Category by it's ID
         public async Task<Category> getCategoryById(int id)

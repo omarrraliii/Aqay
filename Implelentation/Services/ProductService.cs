@@ -218,17 +218,17 @@ namespace aqay_apis.Services
             };
             return paginatedResult;
         }
-        public async Task<PaginatedResult<ProductDto>> GetProductsByCategoryAsync(int categoryId, int pageIndex)
+        public async Task<PaginatedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int pageIndex)
         {
             var products = await _context.Products
                 .Include(p => p.Category)
                 .Include(p => p.Brand)
-                .Where(p => p.CategoryId == categoryId)
+                .Where(p => p.Category.Name == categoryName)
                 .OrderByDescending(p => p.LastEdit)
                 .Skip(_globalVariables.PageSize * (pageIndex - 1))
                 .Take(_globalVariables.PageSize)
                 .ToListAsync();
-            var productCount =await _context.Products.Where(p => p.CategoryId == categoryId).CountAsync();
+            var productCount =await _context.Products.Where(p => p.Category.Name == categoryName).CountAsync();
             var result = products.Select(p=> new ProductDto
             {
                 Id=p.Id,

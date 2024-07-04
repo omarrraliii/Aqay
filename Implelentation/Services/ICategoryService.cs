@@ -2,7 +2,7 @@
 {
     public interface ICategoryService
     {
-        Task<IEnumerable<Category>> getCategories(int page);
+        Task<PaginatedResult<Category>> getCategories(int page);
         Task<Category> getCategoryById(int id);
         Task<Category> getCategoryByName(string name);
         Task<Category> createCategory(string name);

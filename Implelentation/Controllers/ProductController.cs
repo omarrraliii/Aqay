@@ -159,9 +159,9 @@ namespace aqay_apis.Controllers
             return Ok(products);
         }
         [HttpGet("category/")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(int categoryId, int pageIndex = 1)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(string categoryName, int pageIndex = 1)
         {
-            var products = await _productService.GetProductsByCategoryAsync(categoryId, pageIndex);
+            var products = await _productService.GetProductsByCategoryAsync(categoryName, pageIndex);
             return Ok(products);
         }
         [HttpGet("name/")]

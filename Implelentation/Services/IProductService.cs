@@ -13,7 +13,7 @@ namespace aqay_apis.Services
         Task<PaginatedResult<ProductDto>> GetProductsByTag(string tag,int pageIndex);
         Task<PaginatedResult<ProductVariant>> GetProductSpecsAsync(int productId,int pageIndex);
         Task<PaginatedResult<ProductDto>> GetProductsByBrandAsync(int brandId, int pageIndex);
-        Task<PaginatedResult<ProductDto>> GetProductsByCategoryAsync(int categoryId, int pageIndex);
+        Task<PaginatedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int pageIndex);
 
     }
 }
