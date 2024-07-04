@@ -12,6 +12,7 @@
         public DateOnly DateOfBirth { get; set; }
         public WishList WishList { get; set; }
         public int? WishListId { get; set; }
+        public int ShoppingCartId { get; set; }
         public string role { get; set; } = "Consumer";
 
     }

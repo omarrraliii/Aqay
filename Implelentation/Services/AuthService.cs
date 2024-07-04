@@ -104,6 +104,11 @@ namespace aqay_apis.Services
             string[] emailParts = model.Email.Split('@');
             string userName = emailParts[0];
 
+
+            // Create a shopping cart and link it with the consumer
+            var shoppingCartId = await _shoppingCartService.CreateAsync();
+            var shoppingCart = await _shoppingCartService.ReadByIdAsync(shoppingCartId);
+
             // if it doesn't exsist then create a new merchant 
             var consumer = new Consumer
             {
@@ -111,6 +116,7 @@ namespace aqay_apis.Services
                 UserName = userName,
                 Gender = model.Gender,
                 DateOfBirth = model.DateOfBirth,
+                ShoppingCartId = shoppingCartId,
             };
             // if the password and the password Confirm didn't match
             if (model.Password != model.PasswordConfirm)
@@ -132,9 +138,7 @@ namespace aqay_apis.Services
             await _userManager.UpdateAsync(consumer);
             await _context.SaveChangesAsync();
 
-            // Create a shopping cart and link it with the consumer
-            var shoppingCartId = await _shoppingCartService.CreateAsync();
-            var shoppingCart = await _shoppingCartService.ReadByIdAsync(shoppingCartId);
+            
             shoppingCart.ConsumerId = consumer.Id;
             _context.Update(shoppingCart);
             await _context.SaveChangesAsync();
