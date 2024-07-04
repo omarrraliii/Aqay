@@ -54,7 +54,7 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 
 // dashboard services
 builder.Services.AddScoped<MerchantDashboardService>();
-
+builder.Services.AddScoped<AdminDashboardService>();
 // Introduce Azure Blob Service 
 builder.Services.AddSingleton<IAzureBlobService, AzureBlobService>();
 
