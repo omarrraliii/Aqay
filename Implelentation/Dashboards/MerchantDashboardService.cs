@@ -104,7 +104,6 @@ namespace aqay_apis.Dashboards
                 .Where(o => o.BrandId == brandId && o.ORDERSTATUSES == status)
                 .ToListAsync();
         }
-
         private List<int> GetTopProductVariants(List<Order> orders)
         {
             return orders
@@ -114,14 +113,12 @@ namespace aqay_apis.Dashboards
                 .Select(g => g.Key)
                 .ToList();
         }
-
         private async Task<int> GetOrderCountByStatus(int brandId, ORDERSTATUSES status)
         {
             return await _context.Orders
                 .Where(o => o.BrandId == brandId && o.ORDERSTATUSES == status)
                 .CountAsync();
         }
-
         private async Task<List<CategoryStatistics>> GetCategoryStatistics(int brandId, DateTime startDate)
         {
             var ordersCategories = await _context.Orders
@@ -148,7 +145,6 @@ namespace aqay_apis.Dashboards
                 })
                 .ToList();
         }
-
         private async Task<List<ProductRating>> GetProductRatings(int brandId)
         {
             var products = await _context.Products
@@ -158,7 +154,6 @@ namespace aqay_apis.Dashboards
             return products.Select(product => new ProductRating
             {
                 ProductId = product.Id,
-                ProductName = product.Name,
                 AverageRating = product.Rate
             }).ToList();
         }

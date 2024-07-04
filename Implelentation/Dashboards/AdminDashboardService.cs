@@ -170,7 +170,6 @@ namespace aqay_apis.Dashboards
             };
         }
 
-
     }
 
 }
