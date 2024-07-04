@@ -14,7 +14,6 @@ namespace aqay_apis.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly ICategoryService _categoryService;
-        //private readonly IBrandService _brandService;
         private readonly IAzureBlobService _azureBlobService;
         private readonly ITagService _tagService;
         private readonly GlobalVariables _globalVariables;
@@ -190,7 +189,7 @@ namespace aqay_apis.Services
             };
             return paginatedResult;
         }
-        public async Task<PaginatedResult<ProductDto>> GetProductsByBrandAsync(int brandId, int pageIndex)
+        public async Task<PaginatedResult<Product>> GetProductsByBrandAsync(int brandId, int pageIndex)
         {
             var products = await _context.Products
                 .Include(p => p.Brand)
@@ -201,16 +200,16 @@ namespace aqay_apis.Services
                 .Take(_globalVariables.PageSize)
                 .ToListAsync();
             var productCount =await _context.Products.Where(p => p.BrandId == brandId).CountAsync();
-            var result = products.Select(p=> new ProductDto
+            var result = products.Select(p=> new Product
             {
-                Id=p.Id,
+                Id = p.Id,
                 Name=p.Name,
                 Price=p.Price,
                 Description=p.Description,
                 CategoryId=p.CategoryId,
                 BrandId=p.BrandId,
             }).ToList();
-            var paginatedResult = new PaginatedResult<ProductDto>
+            var paginatedResult = new PaginatedResult<Product>
             {
                 Items = result,
                 TotalCount = productCount,
@@ -218,7 +217,7 @@ namespace aqay_apis.Services
             };
             return paginatedResult;
         }
-        public async Task<PaginatedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int pageIndex)
+        public async Task<PaginatedResult<Product>> GetProductsByCategoryAsync(string categoryName, int pageIndex)
         {
             var products = await _context.Products
                 .Include(p => p.Category)
@@ -229,7 +228,7 @@ namespace aqay_apis.Services
                 .Take(_globalVariables.PageSize)
                 .ToListAsync();
             var productCount =await _context.Products.Where(p => p.Category.Name == categoryName).CountAsync();
-            var result = products.Select(p=> new ProductDto
+            var result = products.Select(p=> new Product
             {
                 Id=p.Id,
                 Name=p.Name,
@@ -238,7 +237,7 @@ namespace aqay_apis.Services
                 CategoryId=p.CategoryId,
                 BrandId=p.BrandId,
             }).ToList();
-            var paginatedResult = new PaginatedResult<ProductDto>
+            var paginatedResult = new PaginatedResult<Product>
             {
                 Items = result,
                 TotalCount = productCount,
@@ -285,7 +284,7 @@ namespace aqay_apis.Services
             }
         }
 
-        public async Task<PaginatedResult<ProductDto>> GetProductsByName(string name, int pageIndex)
+        public async Task<PaginatedResult<Product>> GetProductsByName(string name, int pageIndex)
         {
             var products = await _context.Products.Include(p => p.Brand)
                                                 .Include(p => p.Category)
@@ -297,7 +296,7 @@ namespace aqay_apis.Services
             var productsCount =await _context.Products
                                        .Where(p => EF.Functions.Like(p.Name, $"%{name}%"))
                                        .CountAsync();
-            var result = products.Select(p=> new ProductDto
+            var result = products.Select(p=> new Product
             {
                 Id=p.Id,
                 Name=p.Name,
@@ -306,7 +305,7 @@ namespace aqay_apis.Services
                 CategoryId=p.CategoryId,
                 BrandId=p.BrandId,
             }).ToList();
-            var paginatedResult = new PaginatedResult<ProductDto>
+            var paginatedResult = new PaginatedResult<Product>
             {
                 Items = result,
                 TotalCount = productsCount,
@@ -315,7 +314,7 @@ namespace aqay_apis.Services
             return paginatedResult;
         }
 
-        public async Task<PaginatedResult<ProductDto>> GetProductsByTag(string tag, int pageIndex)
+        public async Task<PaginatedResult<Product>> GetProductsByTag(string tag, int pageIndex)
         {
             var tagEntity = await _context.Tags
                 .Include(t => t.Products)
@@ -323,9 +322,9 @@ namespace aqay_apis.Services
 
             if (tagEntity == null)
             {
-                return new PaginatedResult<ProductDto>
+                return new PaginatedResult<Product>
                 {
-                    Items = new List<ProductDto>(),
+                    Items = new List<Product>(),
                     TotalCount = 0,
                     HasMoreItems = false
                 };
@@ -336,7 +335,7 @@ namespace aqay_apis.Services
                 .Skip(_globalVariables.PageSize * (pageIndex - 1))
                 .Take(_globalVariables.PageSize)
                 .ToList();
-            var result = products.Select(p=> new ProductDto
+            var result = products.Select(p=> new Product
             {
                 Id=p.Id,
                 Name=p.Name,
@@ -345,7 +344,7 @@ namespace aqay_apis.Services
                 CategoryId=p.CategoryId,
                 BrandId=p.BrandId,
             }).ToList();
-            var paginatedResult = new PaginatedResult<ProductDto>
+            var paginatedResult = new PaginatedResult<Product>
             {
                 Items = result,
                 TotalCount = totalProductsCount,

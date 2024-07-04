@@ -9,11 +9,11 @@ namespace aqay_apis.Services
         Task<int> AddAsync(ProductDto productDto);
         Task<int> UpdateAsync(int id, ProductDto productDto);
         Task<bool> DeleteAsync(int id);
-        Task<PaginatedResult<ProductDto>> GetProductsByName (string name,int pageIndex);
-        Task<PaginatedResult<ProductDto>> GetProductsByTag(string tag,int pageIndex);
+        Task<PaginatedResult<Product>> GetProductsByName (string name,int pageIndex);
+        Task<PaginatedResult<Product>> GetProductsByTag(string tag,int pageIndex);
         Task<PaginatedResult<ProductVariant>> GetProductSpecsAsync(int productId,int pageIndex);
-        Task<PaginatedResult<ProductDto>> GetProductsByBrandAsync(int brandId, int pageIndex);
-        Task<PaginatedResult<ProductDto>> GetProductsByCategoryAsync(string categoryName, int pageIndex);
+        Task<PaginatedResult<Product>> GetProductsByBrandAsync(int brandId, int pageIndex);
+        Task<PaginatedResult<Product>> GetProductsByCategoryAsync(string categoryName, int pageIndex);
 
     }
 }
