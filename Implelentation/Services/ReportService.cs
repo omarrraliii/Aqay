@@ -27,13 +27,21 @@ public class ReportService:IReportService
         await _context.SaveChangesAsync();
         return report;
     }
-    public async Task<ICollection<Report>> GetReportsAsync(int pageIndex)
+    public async Task<PaginatedResult<Report>> GetReportsAsync(int pageIndex)
     {
-        return await _context.Reports
+        var reports= await _context.Reports
                               .OrderByDescending(r=>r.CreatedOn)
                               .Skip((pageIndex - 1) * _globalVariables.PageSize)
                               .Take(_globalVariables.PageSize)
                               .ToListAsync();
+        var reportsCount= await _context.Reports.CountAsync();
+        var paginatedResult= new PaginatedResult<Report>
+        {
+            Items=reports,
+            TotalCount=reportsCount,
+            HasMoreItems=pageIndex*_globalVariables.PageSize <reportsCount
+        };
+        return paginatedResult;
     }
     public async Task<Report> GetReportByIdAsync (int id)
     {
@@ -54,7 +62,7 @@ public class ReportService:IReportService
         }
         return report;
     }
-    public async Task<ICollection<Report>> GetReportsByStatusAsync(REPORTSTATUSES REPORTSTATUS,int pageIndex)
+    public async Task<PaginatedResult<Report>> GetReportsByStatusAsync(REPORTSTATUSES REPORTSTATUS,int pageIndex)
     {
         List<Report> reports = new List<Report>();
         if (REPORTSTATUS == REPORTSTATUSES.OPEN)
@@ -73,7 +81,14 @@ public class ReportService:IReportService
                                 .Where(r=>r.REPORTSTATUS==REPORTSTATUSES.CLOSED)
                                 .ToListAsync();
         }
-        return reports;
+        var reportsCount= await _context.Reports.CountAsync();
+        var paginatedResult= new PaginatedResult<Report>
+        {
+            Items=reports,
+            TotalCount=reportsCount,
+            HasMoreItems=pageIndex*_globalVariables.PageSize <reportsCount
+        };
+        return paginatedResult;
     }
 
     public async Task<Report> OpenReportAsync(int id, string reviewerId)
@@ -89,11 +104,14 @@ public class ReportService:IReportService
         return report;
     }
 
-    public async Task<Report> UpdateReportAsync(int id,string action, REPORTSTATUSES REPORTSTATUS)
+    public async Task<Report> UpdateReportActionAsync(int id,string? action)
     {
         var report= await _context.Reports.FindAsync(id);
+        if (action == null)
+        {
+            return report;
+        }
         report.Action = action;
-        report.REPORTSTATUS = REPORTSTATUS;
         report.LastEdit= DateTime.Now;
         await _context.SaveChangesAsync();
         return report;
@@ -111,5 +129,21 @@ public class ReportService:IReportService
         await _context.SaveChangesAsync();
         return true;
 
+    }
+
+    public async Task<Report> UpdateReportStatusAsync(int id)
+    {
+        var report=await _context.Reports.FindAsync(id);
+        if (report.REPORTSTATUS==REPORTSTATUSES.CLOSED)
+        {
+            report.REPORTSTATUS=REPORTSTATUSES.OPEN;
+            await _context.SaveChangesAsync();
+        }
+        else
+        {
+            report.REPORTSTATUS=REPORTSTATUSES.CLOSED;
+            await _context.SaveChangesAsync();
+        }
+        return report;
     }
 }

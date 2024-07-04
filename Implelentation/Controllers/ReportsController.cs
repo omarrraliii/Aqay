@@ -1,5 +1,6 @@
 ﻿using aqay_apis.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace aqay_apis;
 [ApiController]
@@ -14,7 +15,7 @@ public class ReportsController: ControllerBase
         _adminService = adminService;
     }
     [HttpPost]
-    public async Task<IActionResult> CreateReport(string title,string intiatorId, string description)
+    public async Task<IActionResult> CreateReport(string title,string intiatorId,[FromBody] string description)
     {
         try
         {
@@ -27,7 +28,7 @@ public class ReportsController: ControllerBase
         }
     }
     [HttpGet]
-    public async Task<IActionResult> GetReports(int pageIndex)
+    public async Task<IActionResult> GetReports(int pageIndex=1)
     {
         var reports= await _reportService.GetReportsAsync(pageIndex);
         return Ok(reports);
@@ -64,10 +65,20 @@ public class ReportsController: ControllerBase
         var report=await _reportService.OpenReportAsync(id,reviewerId);
         return Ok(report);
     }
-    [HttpPut("update")]
-    public async Task<IActionResult> UpdateReport(int id,string action,REPORTSTATUSES reportStatus)
+    [HttpPut("updateAction")]
+    public async Task<IActionResult> UpdateReportAction(int id,string? action)
     {
-        var report=await _reportService.UpdateReportAsync(id,action,reportStatus);
+        if (action.IsNullOrEmpty())
+        {
+            return Ok();    
+        }
+        var report=await _reportService.UpdateReportActionAsync(id,action);
+        return Ok(report);
+    }
+    [HttpPut("updateStatus")]
+    public async Task<IActionResult> UpdateReportStatus(int id)
+    {
+        var report=await _reportService.UpdateReportStatusAsync(id);
         return Ok(report);
     }
     [HttpDelete]
