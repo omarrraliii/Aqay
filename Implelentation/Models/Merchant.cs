@@ -12,5 +12,6 @@ namespace aqay_apis.Models
         public int? SubscriptionId { get; set; }
         public Subscription? Subscription { get; set; }
         public string BrandName { get; set; }
+        public string role { get; set; } = "Owner";
     }
 }

@@ -64,12 +64,16 @@ namespace aqay_apis.Services
                     return authModel;
 
                 }
-                if (!merchant.IsSubscriped)
+                if (merchant.IsSubscriped)
                 {
-                    authModel.Message = "User is a merchant but not subscribed. Cannot log in.";
-                    return authModel;
+                    authModel.isSub = true;
                 }
-                authModel.isSub = false;
+                else
+                {
+                    authModel.Message = "User is a merchant but not subscribed.";
+                    authModel.isSub = false;
+                }
+
             }
             else
             {
