@@ -307,5 +307,32 @@ namespace aqay_apis.Services
 
             return "Admin created successfully!";
         }
+        public async Task ResetPasswordAsync(string email, string oldPassword, string newPassword, DateOnly dateOfBirth)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                throw new Exception("User not found.");
+            }
+
+            if (user.DateOfBirth != dateOfBirth)
+            {
+                throw new Exception("Date of Birth is not right .. U expect me to believe u forgot you birthday? come on .. Hacker!");
+            }
+
+            var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, oldPassword);
+            if (!isPasswordCorrect)
+            {
+                throw new Exception("Incorrect old password.");
+            }
+
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+            if (!result.Succeeded)
+            {
+                throw new Exception("Password reset failed.");
+            }
+        }
+
     }
 }

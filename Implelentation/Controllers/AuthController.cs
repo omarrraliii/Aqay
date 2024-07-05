@@ -1,8 +1,8 @@
 ﻿using aqay_apis.Models;
 using aqay_apis.Services;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
+using aqay_apis.Models;
 namespace aqay_apis.Controllers
 {
     [Route("api/[controller]")]
@@ -11,6 +11,7 @@ namespace aqay_apis.Controllers
     {
         // inject the service
         private readonly IAuthService _authService;
+        private readonly UserManager<User> _userManager;
         public AuthController(IAuthService authService)
         {
             _authService = authService;
@@ -85,5 +86,24 @@ namespace aqay_apis.Controllers
             return Ok(result);
         }
 
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                await _authService.ResetPasswordAsync(model.Email, model.OldPassword, model.NewPassword, model.dateOfBirth);
+                return Ok("Password reset successful.");
+            }
+            catch (Exception ex)
+            {
+                // Log the exception with details (excluding sensitive data)
+                return BadRequest($"Error resetting password for {model.Email}: {ex.Message}");
+            }
+        }
     }
 }

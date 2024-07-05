@@ -5,5 +5,6 @@ namespace aqay_apis.Models
     {
         public bool Gender { get; set; } // 0 -> males 1 -> females
         public bool IsActive { get; set; } = true;
+        public DateOnly DateOfBirth { get; set; }
     }
 }
