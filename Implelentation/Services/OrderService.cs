@@ -1,67 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
 using aqay_apis.Context;
 using aqay_apis.Models;
 using Microsoft.EntityFrameworkCore;
-
 namespace aqay_apis.Services
 {
     public class OrderService : IOrderService
     {
         private readonly ApplicationDbContext _context;
-        private readonly GlobalVariables _globalVariables;
-        private readonly int _pageSize;
         private readonly IProductVariantService _productVariantService;
         private readonly IProductService _productService;
         private readonly IShoppingCartService _shoppingCartService;
-        public OrderService(ApplicationDbContext context, GlobalVariables globalVariables, IProductVariantService productVariantService, IProductService productService, IShoppingCartService shoppingCartService)
+        public OrderService(ApplicationDbContext context, IProductVariantService productVariantService, IProductService productService, IShoppingCartService shoppingCartService)
         {
             _context = context;
-            _globalVariables = globalVariables;
-            _pageSize = _globalVariables.PageSize;
             _productVariantService = productVariantService;
             _productService = productService;
             _shoppingCartService = shoppingCartService;
         }
-        public async Task<PaginatedResult<Order>> GetOrdersByConsumerIdAsync(string consumerId, int pageNumber)
+        public async Task<IEnumerable<Order>> GetOrdersByConsumerIdAsync(string consumerId)
         {
-            var orders = await _context.Orders
+           return await _context.Orders
                 .Where(o => o.ConsumerId == consumerId)
                 .OrderByDescending(o => o.LastEdit)
-                .Skip((pageNumber - 1) * _pageSize)
-                .Take(_pageSize)
                 .ToListAsync();
-
-            var totalCount = await _context.Orders.CountAsync(o => o.ConsumerId == consumerId);
-            var hasMoreItems = (pageNumber * _pageSize) < totalCount;
-
-            return new PaginatedResult<Order>
-            {
-                Items = orders,
-                TotalCount = totalCount,
-                HasMoreItems = hasMoreItems
-            };
         }
-        public async Task<PaginatedResult<Order>> GetOrdersByMerchantIdAsync(int merchantId, int pageNumber)
+        public async Task<IEnumerable<Order>> GetOrdersByMerchantIdAsync(int merchantId)
         {
-            var orders = await _context.Orders
+            return await _context.Orders
                 .Where(o => o.BrandId == merchantId)
                 .OrderByDescending(o => o.LastEdit)
-                .Skip((pageNumber - 1) * _pageSize)
-                .Take(_pageSize)
                 .ToListAsync();
 
-            var totalCount = await _context.Orders.CountAsync(o => o.BrandId == merchantId);
-            var hasMoreItems = (pageNumber * _pageSize) < totalCount;
-
-            return new PaginatedResult<Order>
-            {
-                Items = orders,
-                TotalCount = totalCount,
-                HasMoreItems = hasMoreItems
-            };
         }
         public async Task<Order> GetOrderByIdAsync(int id)
         {
@@ -121,43 +90,21 @@ namespace aqay_apis.Services
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<PaginatedResult<Order>> GetOrdersByMerchantAndStatusAsync(int brandId, ORDERSTATUSES status, int pageNumber)
+        public async Task<IEnumerable<Order>> GetOrdersByMerchantAndStatusAsync(int brandId, ORDERSTATUSES status)
         {
-            var orders = await _context.Orders
+            return await _context.Orders
                 .Where(o => o.BrandId == brandId && o.ORDERSTATUSES == status)
                 .OrderByDescending(o => o.LastEdit)
-                .Skip((pageNumber - 1) * _pageSize)
-                .Take(_pageSize)
                 .ToListAsync();
 
-            var totalCount = await _context.Orders.CountAsync(o => o.BrandId == brandId && o.ORDERSTATUSES == status);
-            var hasMoreItems = (pageNumber * _pageSize) < totalCount;
-
-            return new PaginatedResult<Order>
-            {
-                Items = orders,
-                TotalCount = totalCount,
-                HasMoreItems = hasMoreItems
-            };
+            
         }
-        public async Task<PaginatedResult<Order>> GetOrderHistoryByConsumerIdAsync(string consumerId, ORDERSTATUSES status, int pageNumber)
+        public async Task<IEnumerable<Order>> GetOrderHistoryByConsumerIdAsync(string consumerId, ORDERSTATUSES status)
         {
-            var orders = await _context.Orders
+           return await _context.Orders
                 .Where(o => o.ConsumerId == consumerId && o.ORDERSTATUSES == status)
                 .OrderByDescending(o => o.LastEdit)
-                .Skip((pageNumber - 1) * _pageSize)
-                .Take(_pageSize)
                 .ToListAsync();
-
-            var totalCount = await _context.Orders.CountAsync(o => o.ConsumerId == consumerId && o.ORDERSTATUSES == status);
-            var hasMoreItems = (pageNumber * _pageSize) < totalCount;
-
-            return new PaginatedResult<Order>
-            {
-                Items = orders,
-                TotalCount = totalCount,
-                HasMoreItems = hasMoreItems
-            };
         }
         public async Task<PromoCode> CreatePromoCodeAsync(PromoCodeDto promoCodeDto)
         {

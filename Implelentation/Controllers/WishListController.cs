@@ -1,68 +1,70 @@
 ﻿using aqay_apis.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-
-namespace aqay_apis.Controllers;
-[Route("api/[controller]")]
-[ApiController]
-public class WishListController : ControllerBase
+namespace aqay_apis.Controllers
 {
-    private IWishListService _wishListService;
-    public WishListController(IWishListService wishListService)
+    //[Authorize(Roles = "Consumer,Admin")]
+    [Route("api/[controller]")]
+    [ApiController]
+    public class WishListController : ControllerBase
     {
-        _wishListService = wishListService;
-    }
-    [HttpPost("addProduct")]
-    public async Task<IActionResult> AddProductToWishList(int id, int productId)
-    {
-        var wishList = await _wishListService.AddProductToWishList(id, productId);
-        if (wishList == null)
+        private IWishListService _wishListService;
+        public WishListController(IWishListService wishListService)
         {
-            return NotFound();
+            _wishListService = wishListService;
         }
-        return Ok(wishList);
-    }
-    [HttpDelete("removeProduct")]
-    public async Task<IActionResult> RemoveProductFromWishList(int id, int productId)
-    {
-        var wishList = await _wishListService.RemoveProductFromWishList(id, productId);
-        if (wishList == null)
+        [HttpPost("addProduct")]
+        public async Task<IActionResult> AddProductToWishList(int id, int productId)
         {
-            return NotFound();
+            try
+            {
+                var wishList = await _wishListService.AddProductToWishList(id, productId);
+                if (wishList == null)
+                {
+                    return NotFound();
+                }
+                return Ok(wishList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-        return Ok(wishList);
-    }
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetWishListById(int id, int pageIndex = 1)
-    {
-        var wishList = await _wishListService.GetWishListByIdAsync(id, pageIndex);
-        if (wishList == null)
+        [HttpDelete("removeProduct")]
+        public async Task<IActionResult> RemoveProductFromWishList(int id, int productId)
         {
-            return NotFound($"WishList with ID {id} not found.");
+            try
+            {
+                var wishList = await _wishListService.RemoveProductFromWishList(id, productId);
+                if (wishList == null)
+                {
+                    return NotFound();
+                }
+                return Ok(wishList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-        return Ok(wishList);
-    }
-    [HttpPost("create")]
-    public async Task<IActionResult> CreateWishList([FromBody] Consumer consumer)
-    {
-        if (consumer == null)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetWishListById(int id)
         {
-            return BadRequest("Consumer data is null.");
+            try
+            {
+                var wishList = await _wishListService.GetWishListByIdAsync(id);
+                if (wishList == null)
+                {
+                    return NotFound($"WishList with ID {id} not found.");
+                }
+                return Ok(wishList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-
-        var wishList = await _wishListService.CreateWishListAsync(consumer);
-        return CreatedAtAction(nameof(GetWishListById), new { id = wishList.Id }, wishList);
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteWishList(int id)
-    {
-        var isDeleted = await _wishListService.DeleteWishListAsync(id);
-        if (!isDeleted)
-        {
-            return NotFound($"WishList with ID {id} not found.");
-        }
-        return NoContent();
     }
 }
+
 

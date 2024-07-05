@@ -43,7 +43,6 @@ namespace aqay_apis.Context
             builder.Entity<Consumer>()
             .HasOne(c => c.WishList)
             .WithOne(w => w.Consumer)
-            .HasForeignKey<Consumer>(w => w.WishListId)
             .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Plan>().HasData(

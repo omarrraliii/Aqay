@@ -1,5 +1,4 @@
-﻿using aqay_apis.Models.Paymob;
-namespace aqay_apis.Services
+﻿namespace aqay_apis.Services
 {
     public interface IPaymentService
     {   
@@ -10,3 +9,4 @@ namespace aqay_apis.Services
     }
 }
 
+ 

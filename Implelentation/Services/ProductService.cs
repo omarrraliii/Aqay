@@ -16,24 +16,18 @@ namespace aqay_apis.Services
         private readonly ICategoryService _categoryService;
         private readonly IAzureBlobService _azureBlobService;
         private readonly ITagService _tagService;
-        private readonly GlobalVariables _globalVariables;
-
-        public ProductService(ApplicationDbContext context, ICategoryService categoryService, IAzureBlobService azureBlobService, ITagService tagService, GlobalVariables globalVariables)
+        public ProductService(ApplicationDbContext context, ICategoryService categoryService, IAzureBlobService azureBlobService, ITagService tagService)
         {
             _context = context;
             _categoryService = categoryService;
-            // _brandService = brandService;
             _azureBlobService = azureBlobService;
             _tagService = tagService;
-            _globalVariables = globalVariables;
         }
-        public async Task<PaginatedResult<object>> GetAllAsync(int pageIndex)
+        public async Task<IEnumerable<object>> GetAllAsync()
         {
             var products = await _context.Products
                 .Include(p => p.ProductVariants)
                 .OrderByDescending(p => p.LastEdit)
-                .Skip(_globalVariables.PageSize * (pageIndex - 1))
-                .Take(_globalVariables.PageSize)
                 .ToListAsync();
             var productsWithOneVariant = products.Select(p => new
             {
@@ -41,14 +35,7 @@ namespace aqay_apis.Services
                 ProductVariants = p.ProductVariants.Take(1)
                 //i want to return the first object in the ProductVariants
             }).ToList();
-            var productsCount = await _context.Products.CountAsync();
-            var paginatedResult = new PaginatedResult<object>
-            {
-                Items = productsWithOneVariant,
-                TotalCount = productsCount,
-                HasMoreItems = pageIndex * _globalVariables.PageSize < productsCount
-            };
-            return paginatedResult;
+            return productsWithOneVariant;
         }
         public async Task<Product> GetByIdAsync(int id)
         {
@@ -66,14 +53,11 @@ namespace aqay_apis.Services
         public async Task<int> AddAsync(ProductDto productDto)
         {
             ValidateProductDto(productDto);
-
             var category = await _categoryService.getCategoryById(productDto.CategoryId);
             if (category == null)
             {
                 throw new Exception("Category not found.");
             }
-
-
             var product = new Product
             {
                 Name = productDto.Name,
@@ -90,10 +74,11 @@ namespace aqay_apis.Services
             {
                 foreach (var tag in productDto.TagName)
                 {
-                    var retrievedTag = await _tagService.GetTagByNameAsync(tag);
+                    var lowerCasetag = tag.ToLower();
+                    var retrievedTag = await _tagService.GetTagByNameAsync(lowerCasetag);
                     if (retrievedTag == null)
                     {
-                        var CreatedTag = await _tagService.CreateTagAsync(tag);
+                        var CreatedTag = await _tagService.CreateTagAsync(lowerCasetag);
                         product.Tags.Add(CreatedTag);
                     }
                     else
@@ -134,14 +119,13 @@ namespace aqay_apis.Services
                 var existingTagNames = product.Tags.Select(t => t.Name).ToHashSet();
                 foreach (var tag in productDto.TagName)
                 {
-                    if (!existingTagNames.Contains(tag))
+                    var lowerCasetag = tag.ToLower();
+                    if (!existingTagNames.Contains(lowerCasetag))
                     {
-
-
-                        var retrievedTag = await _tagService.GetTagByNameAsync(tag);
+                        var retrievedTag = await _tagService.GetTagByNameAsync(lowerCasetag);
                         if (retrievedTag == null)
                         {
-                            var CreatedTag = await _tagService.CreateTagAsync(tag);
+                            var CreatedTag = await _tagService.CreateTagAsync(lowerCasetag);
                             product.Tags.Add(CreatedTag);
                         }
                         else
@@ -167,40 +151,27 @@ namespace aqay_apis.Services
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<PaginatedResult<ProductVariant>> GetProductSpecsAsync(int productId, int pageIndex)
+        public async Task<IEnumerable<ProductVariant>> GetProductSpecsAsync(int productId)
         {
             var product = await _context.Products
                 .Include(p => p.ProductVariants)
-                .Skip((pageIndex - 1) * _globalVariables.PageSize)
-                .Take(_globalVariables.PageSize)
                 .FirstOrDefaultAsync(p => p.Id == productId);
 
             if (product == null)
             {
                 throw new Exception("Product not found.");
             }
-            var productVariantsCount = product.ProductVariants.Count;
-            var productVariants = product.ProductVariants;
-            var paginatedResult = new PaginatedResult<ProductVariant>
-            {
-                Items = productVariants,
-                TotalCount = productVariantsCount,
-                HasMoreItems = pageIndex * _globalVariables.PageSize < productVariantsCount
-            };
-            return paginatedResult;
+            return product.ProductVariants;
         }
-        public async Task<PaginatedResult<Product>> GetProductsByBrandAsync(int brandId, int pageIndex)
+        public async Task<IEnumerable<Product>> GetProductsByBrandAsync(int brandId)
         {
             var products = await _context.Products
                 .Include(p => p.Brand)
                 .Include(p => p.Category)
                 .Where(p => p.BrandId == brandId)
                 .OrderByDescending(p => p.LastEdit)
-                .Skip(_globalVariables.PageSize * (pageIndex - 1))
-                .Take(_globalVariables.PageSize)
                 .ToListAsync();
-            var productCount =await _context.Products.Where(p => p.BrandId == brandId).CountAsync();
-            var result = products.Select(p=> new Product
+            return products.Select(p=> new Product
             {
                 Id = p.Id,
                 Name=p.Name,
@@ -209,26 +180,16 @@ namespace aqay_apis.Services
                 CategoryId=p.CategoryId,
                 BrandId=p.BrandId,
             }).ToList();
-            var paginatedResult = new PaginatedResult<Product>
-            {
-                Items = result,
-                TotalCount = productCount,
-                HasMoreItems = pageIndex * _globalVariables.PageSize < productCount
-            };
-            return paginatedResult;
         }
-        public async Task<PaginatedResult<Product>> GetProductsByCategoryAsync(string categoryName, int pageIndex)
+        public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(string categoryName)
         {
             var products = await _context.Products
                 .Include(p => p.Category)
                 .Include(p => p.Brand)
                 .Where(p => p.Category.Name == categoryName)
                 .OrderByDescending(p => p.LastEdit)
-                .Skip(_globalVariables.PageSize * (pageIndex - 1))
-                .Take(_globalVariables.PageSize)
                 .ToListAsync();
-            var productCount =await _context.Products.Where(p => p.Category.Name == categoryName).CountAsync();
-            var result = products.Select(p=> new Product
+            return products.Select(p=> new Product
             {
                 Id=p.Id,
                 Name=p.Name,
@@ -237,13 +198,6 @@ namespace aqay_apis.Services
                 CategoryId=p.CategoryId,
                 BrandId=p.BrandId,
             }).ToList();
-            var paginatedResult = new PaginatedResult<Product>
-            {
-                Items = result,
-                TotalCount = productCount,
-                HasMoreItems = pageIndex * _globalVariables.PageSize < productCount
-            };
-            return paginatedResult;
         }
         private void ValidateProductDto(ProductDto productDto, bool isNew = true)
         {
@@ -283,20 +237,17 @@ namespace aqay_apis.Services
                 }
             }
         }
-
-        public async Task<PaginatedResult<Product>> GetProductsByName(string name, int pageIndex)
+        public async Task<IEnumerable<Product>> GetProductsByName(string name)
         {
             var products = await _context.Products.Include(p => p.Brand)
                                                 .Include(p => p.Category)
                                                 .Include(p => p.ProductVariants)
                                                 .Where(p => EF.Functions.Like(p.Name, $"%{name}%"))
-                                                .Skip((pageIndex - 1) * _globalVariables.PageSize)
-                                                .Take(_globalVariables.PageSize)
                                                 .ToListAsync();
             var productsCount =await _context.Products
                                        .Where(p => EF.Functions.Like(p.Name, $"%{name}%"))
                                        .CountAsync();
-            var result = products.Select(p=> new Product
+            return products.Select(p=> new Product
             {
                 Id=p.Id,
                 Name=p.Name,
@@ -304,17 +255,8 @@ namespace aqay_apis.Services
                 Description=p.Description,
                 CategoryId=p.CategoryId,
                 BrandId=p.BrandId,
-            }).ToList();
-            var paginatedResult = new PaginatedResult<Product>
-            {
-                Items = result,
-                TotalCount = productsCount,
-                HasMoreItems = pageIndex * _globalVariables.PageSize < productsCount
-            };
-            return paginatedResult;
-        }
-
-        public async Task<PaginatedResult<Product>> GetProductsByTag(string tag, int pageIndex)
+            }).ToList();        }
+        public async Task<IEnumerable<Product>> GetProductsByTag(string tag)
         {
             var tagEntity = await _context.Tags
                 .Include(t => t.Products)
@@ -322,20 +264,12 @@ namespace aqay_apis.Services
 
             if (tagEntity == null)
             {
-                return new PaginatedResult<Product>
-                {
-                    Items = new List<Product>(),
-                    TotalCount = 0,
-                    HasMoreItems = false
-                };
+                return new List<Product>();
             }
-            var totalProductsCount = tagEntity.Products.Count;
             var products = tagEntity.Products
                 .OrderByDescending(p => p.LastEdit)
-                .Skip(_globalVariables.PageSize * (pageIndex - 1))
-                .Take(_globalVariables.PageSize)
                 .ToList();
-            var result = products.Select(p=> new Product
+            return products.Select(p=> new Product
             {
                 Id=p.Id,
                 Name=p.Name,
@@ -344,14 +278,6 @@ namespace aqay_apis.Services
                 CategoryId=p.CategoryId,
                 BrandId=p.BrandId,
             }).ToList();
-            var paginatedResult = new PaginatedResult<Product>
-            {
-                Items = result,
-                TotalCount = totalProductsCount,
-                HasMoreItems = pageIndex * _globalVariables.PageSize < totalProductsCount
-            };
-
-            return paginatedResult;
         }
 
     }

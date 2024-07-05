@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using aqay_apis.Services;
 using System.Text.Json;
-
 namespace aqay_apis.Controllers
 {
     [ApiController]

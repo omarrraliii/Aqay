@@ -1,5 +1,4 @@
 ﻿using aqay_apis.Dtos;
-
 namespace aqay_apis.Services
 {
     public interface IProductVariantService

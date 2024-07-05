@@ -1,11 +1,10 @@
 ﻿using aqay_apis.Services;
-using aqay_apis.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace aqay_apis.Controllers
 {
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ShoppingCartController : ControllerBase
@@ -15,61 +14,100 @@ namespace aqay_apis.Controllers
         {
             _shoppingCartService = shoppingCartService;
         }
+        //[Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<int>> Create()
+        public async Task<ActionResult<int>> Create(string consumerId)
         {
-            var cartId = await _shoppingCartService.CreateAsync();
-            return Ok(cartId);
+            try
+            {
+                var cartId = await _shoppingCartService.CreateAsync(consumerId);
+                return Ok(cartId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("id")]
         public async Task<ActionResult<ShoppingCart>> ReadById(int id)
         {
-            var cart = await _shoppingCartService.ReadByIdAsync(id);
-            if (cart == null)
+            try
             {
-                return NotFound();
+                var cart = await _shoppingCartService.ReadByIdAsync(id);
+                if (cart == null)
+                {
+                    return NotFound();
+                }
+                return Ok(cart);
             }
-            return Ok(cart);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-
         [HttpGet]
         public async Task<ActionResult<ICollection<ShoppingCart>>> ReadAll()
         {
-            var carts = await _shoppingCartService.ReadAllAsync();
-            return Ok(carts);
+            try
+            {
+                var carts = await _shoppingCartService.ReadAllAsync();
+                return Ok(carts);
+            }
+            catch (Exception ex) { 
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("shoppingCartId/addProduct")]
         public async Task<ActionResult<bool>> AddProductVariant(int shoppingCartId, int productVariantId)
         {
-            var success = await _shoppingCartService.AddProductVariantAsync(shoppingCartId, productVariantId);
-            if (success)
+            try
             {
-                return Ok(true);
+                var success = await _shoppingCartService.AddProductVariantAsync(shoppingCartId, productVariantId);
+                if (success)
+                {
+                    return Ok(true);
+                }
+                return BadRequest(false);
             }
-            return BadRequest(false);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpPost("shoppingCartId/removeProduct")]
         public async Task<ActionResult<bool>> RemoveProductVariant(int shoppingCartId, [FromBody] int productVariantId)
         {
-            var success = await _shoppingCartService.RemoveProductVariantAsync(shoppingCartId, productVariantId);
-            if (success)
+            try
             {
-                return Ok(true);
+                var success = await _shoppingCartService.RemoveProductVariantAsync(shoppingCartId, productVariantId);
+                if (success)
+                {
+                    return Ok(true);
+                }
+                return BadRequest(false);
             }
-            return BadRequest(false);
+            catch (Exception ex) { 
+                return BadRequest (ex.Message);
+            }
         }
-
         [HttpGet("shoppingCartId/variants")]
         public async Task<ActionResult<IList<ProductVariant>>> GetProductVariants(int shoppingCartId)
         {
-            var productVariants = await _shoppingCartService.GetProductVariantsAsync(shoppingCartId);
-            if (productVariants == null)
+            try
             {
-                return NotFound();
+                var productVariants = await _shoppingCartService.GetProductVariantsAsync(shoppingCartId);
+                if (productVariants == null)
+                {
+                    return NotFound();
+                }
+                return Ok(productVariants);
             }
-            return Ok(productVariants);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

@@ -1,8 +1,5 @@
-﻿using aqay_apis.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 namespace aqay_apis.Controllers
 {
     [ApiController]
@@ -10,7 +7,6 @@ namespace aqay_apis.Controllers
     public class BrandController : ControllerBase
     {
         private readonly IBrandService _brandService;
-
         public BrandController(IBrandService brandService)
         {
             _brandService = brandService;
@@ -18,28 +14,41 @@ namespace aqay_apis.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBrandById(int id)
         {
-            var brand = await _brandService.GetBrandByIdAsync(id);
-            if (brand == null)
+            try
             {
-                return NotFound();
+                var brand = await _brandService.GetBrandByIdAsync(id);
+                return Ok(brand);
             }
-            return Ok(brand);
-        }
-
+            catch (Exception ex) { 
+                return BadRequest(ex.Message);
+            }
+         }
         [HttpGet]
-        public async Task<IActionResult> GetAllBrands(int pageIndex = 1)
+        public async Task<IActionResult> GetAllBrands()
         {
-            var paginatedBrands = await _brandService.GetAllBrandsAsync(pageIndex);
-            return Ok(paginatedBrands);
+            try
+            {
+                var paginatedBrands = await _brandService.GetAllBrandsAsync();
+                return Ok(paginatedBrands);
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
         }
-
+        //[Authorize(Roles = "Owner,Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBrand(int id, [FromForm] BrandDto brandDto)
         {
-            var updatedBrand = await _brandService.EditProfileAsync(id, brandDto);
-            return Ok(updatedBrand);
+            try
+            {
+                var updatedBrand = await _brandService.EditProfileAsync(id, brandDto);
+                return Ok(updatedBrand);
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
         }
-
+        //[Authorize(Roles = "Owner, Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBrand(int id)
         {

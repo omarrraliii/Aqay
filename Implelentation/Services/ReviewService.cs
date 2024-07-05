@@ -10,41 +10,21 @@ namespace aqay_apis.Services
     public class ReviewService : IReviewService
     {
         private readonly ApplicationDbContext _context;
-        private readonly GlobalVariables _globalVariables;
         private readonly UserManager<User> _userManager;
-        public ReviewService(ApplicationDbContext applicationDbContext, GlobalVariables globalVariables, UserManager<User> userManager)
+        public ReviewService(ApplicationDbContext applicationDbContext, UserManager<User> userManager)
         {
             _context = applicationDbContext;
-            _globalVariables = globalVariables;
             _userManager = userManager;
         }
-        public async Task<PaginatedResult<Review>> GetAllReviewsAsync(int pageIndex, int productId)
+        public async Task<IEnumerable<Review>> GetAllReviewsAsync(int productId)
         {
-            int pageSize = _globalVariables.PageSize;
-
-            // Get total count of reviews for the product
-            int totalCount = await _context.Reviews
-                                           .Where(r => r.ProductId == productId)
-                                           .CountAsync();
-
-            // Get the reviews for the specific page
-            var reviews = await _context.Reviews
+           
+            return await _context.Reviews
                                         .Where(r => r.ProductId == productId)
-                                        .OrderByDescending(r => r.CreatedOn)
-                                        .Skip((pageIndex - 1) * pageSize)
-                                        .Take(pageSize)
+                                        .OrderByDescending(r => r.CreatedOn)         
                                         .ToListAsync();
 
-            var paginatedResult = new PaginatedResult<Review>
-            {
-                Items = reviews,
-                TotalCount = totalCount,
-                HasMoreItems = (pageIndex * pageSize) < totalCount
-            };
-
-            return paginatedResult;
         }
-
         public async Task<Review> GetById(int id)
         {
             var review = await _context.Reviews.FindAsync(id);
@@ -55,7 +35,6 @@ namespace aqay_apis.Services
             return review;
 
         }
-
         public async Task<Review> ReviewProductAsync(ReviewDto review)
         {
             var rate = review.Rate;

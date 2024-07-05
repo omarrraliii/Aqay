@@ -5,7 +5,7 @@ namespace aqay_apis
 {
     public interface IFAQService
     {
-        Task<PaginatedResult<FAQ>> GetAllFAQs(int pageIndex);
+        Task<IEnumerable<FAQ>> GetAllFAQs();
         Task<FAQ> GetFAQById(int id);
         Task<FAQ> CreateFAQ(string question,string answer);
         Task<FAQ> UpdateFAQ(int id,string question,string answer);

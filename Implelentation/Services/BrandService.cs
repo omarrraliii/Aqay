@@ -1,6 +1,4 @@
 ﻿using aqay_apis.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using aqay_apis.Context;
 using Microsoft.AspNetCore.Identity;
@@ -11,18 +9,14 @@ namespace aqay_apis
     public class BrandService : IBrandService
     {
         private readonly ApplicationDbContext _context;
-        private readonly GlobalVariables _globalVariables;
         private readonly UserManager<User> _userManager;
         private readonly IAzureBlobService _azureBlobService;
-
-        public BrandService(ApplicationDbContext context, UserManager<User> userManager,GlobalVariables globalVariables, IAzureBlobService azureBlobService)
+        public BrandService(ApplicationDbContext context, UserManager<User> userManager, IAzureBlobService azureBlobService)
         {
             _context = context;
-            _globalVariables = globalVariables;
             _userManager = userManager;
             _azureBlobService = azureBlobService;
         }
-
         public async Task<Brand> CreateBrandAsync(string BrandOwnerId)
         {
             var merchant = await _context.Merchants.FindAsync(BrandOwnerId);
@@ -37,34 +31,29 @@ namespace aqay_apis
                 Instagram = null,
                 Facebook =  null,
                 WPNumber =  null,
+                LogoUrl = null,
                 BrandOwnerId = BrandOwnerId,
                 About = null,
                 CreatedOn = DateTime.Now,
                 LastEdit = DateTime.Now
             };
-
             _context.Brands.Add(brand);
             await _context.SaveChangesAsync();
             return brand;
         }
         public async Task<Brand> GetBrandByIdAsync(int id)
         {
-            return await _context.Brands.FindAsync(id);
+            var brand = await _context.Brands.FindAsync(id);
+            if (brand == null) {
+                throw new Exception("Brand not found");
+            }
+            return brand;
         }
-        public async Task<PaginatedResult<Brand>> GetAllBrandsAsync(int pageIndex)
+        public async Task<IEnumerable<Brand>> GetAllBrandsAsync()
         {
             var Brands=await _context.Brands.OrderByDescending(b=>b.CreatedOn)
-                                            .Skip((pageIndex-1)*_globalVariables.PageSize)
-                                            .Take(_globalVariables.PageSize)
                                             .ToListAsync();
-            var brandCount= Brands.Count;
-            var paginatedResult= new PaginatedResult<Brand>
-            {
-                Items=Brands,
-                TotalCount=brandCount,
-                HasMoreItems=(pageIndex*_globalVariables.PageSize)<brandCount
-            };
-            return paginatedResult;
+            return Brands;
         }
         public async Task<Brand> EditProfileAsync(int id, BrandDto brandDto)
         {
@@ -101,13 +90,11 @@ namespace aqay_apis
             {
                 brand.About = brandDto.About;
             }
-
             if (brandDto.Logo != null)
             {
                 brand.LogoUrl = await _azureBlobService.UploadAsync(brandDto.Logo);
             }
             brand.LastEdit = DateTime.Now;
-
             _context.Brands.Update(brand);
             await _context.SaveChangesAsync();
             return brand;
@@ -117,9 +104,8 @@ namespace aqay_apis
             var brand = await _context.Brands.FindAsync(id);
             if (brand == null)
             {
-                return false;
+                throw new Exception("Brand not found!");
             }
-
             _context.Brands.Remove(brand);
             await _context.SaveChangesAsync();
             return true;

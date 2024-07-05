@@ -1,7 +1,6 @@
 ﻿using aqay_apis.Models;
 
 namespace aqay_apis;
-
 public class Review
 {
     public int Id { get; set; }

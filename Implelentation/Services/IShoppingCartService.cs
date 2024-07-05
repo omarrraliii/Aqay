@@ -6,7 +6,7 @@ namespace aqay_apis.Services
 {
     public interface IShoppingCartService
     {
-        Task<int> CreateAsync();
+        Task<int> CreateAsync(string ConsumerId);
         Task<bool> SetConsumerIdAsync(int shoppingCartId, string consumerId);
         Task<bool> DeleteAsync(int id);
         Task<ShoppingCart> ReadByIdAsync(int id);

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace aqay_apis;
+﻿namespace aqay_apis;
 
 public class Category
 {

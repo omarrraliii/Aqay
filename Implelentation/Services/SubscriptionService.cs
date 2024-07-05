@@ -1,11 +1,5 @@
 ﻿using aqay_apis.Context;
-using aqay_apis.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace aqay_apis.Services
 {
     public class SubscriptionService : ISubscriptionService
@@ -32,7 +26,6 @@ namespace aqay_apis.Services
         {
             // Retrieve merchant by ID and check if owner
             var merchant = await _context.Merchants
-                                 .Include(u => u.Subscription)
                                  .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (merchant == null)
@@ -50,9 +43,7 @@ namespace aqay_apis.Services
             // Add subscription and update merchant in a single transaction
             var sub = await CreateAsync(planId);
 
-
-            merchant.Subscription = sub;
-            merchant.SubscriptionId = sub.Id;
+            merchant.IsSubscriped = true;
             _context.Merchants.Update(merchant);
 
             await _context.SaveChangesAsync();

@@ -9,15 +9,10 @@ namespace aqay_apis
     public class TagService : ITagService
     {
         private readonly ApplicationDbContext _context;
-        private readonly GlobalVariables _globalVariables;
-
-        public TagService(ApplicationDbContext context, GlobalVariables globalVariables)
+        public TagService(ApplicationDbContext context)
         {
             _context = context;
-            _globalVariables = globalVariables;
         }
-
-
         public async Task<Tag> CreateTagAsync(string name)
         {
             var tag = new Tag
@@ -29,7 +24,6 @@ namespace aqay_apis
             await _context.SaveChangesAsync();
             return tag;
         }
-
         public async Task<Tag> GetTagByNameAsync(string name)
         {
             var tag= await _context.Tags.FirstOrDefaultAsync(t=>t.Name == name.ToLower());
@@ -39,7 +33,6 @@ namespace aqay_apis
             }
             return tag;
         }
-
         public async Task<Tag> GetTagByIdAsync(int id)
         {
             var tag=await _context.Tags.FindAsync(id);
@@ -53,20 +46,10 @@ namespace aqay_apis
 
         public async Task<IEnumerable<Tag>> GetAllTagsAsync(int pageIndex)
         {
-            var tags = await _context.Tags.OrderByDescending(t => t.Name)
-                                           .Skip((pageIndex - 1) * _globalVariables.PageSize)
-                                           .Take(_globalVariables.PageSize)
+            return await _context.Tags.OrderByDescending(t => t.Name)
                                            .ToListAsync();
-            var tagCount = await _context.Tags.CountAsync();
-            var paginatedResult = new PaginatedResult<Tag>
-            {
-                Items = tags,
-                TotalCount = tagCount,
-                HasMoreItems = (pageIndex * _globalVariables.PageSize) < tagCount
-            };
-            return paginatedResult.Items;
+           
         }
-
         public async Task<Tag> UpdateTagAsync(int id, string name)
         {
             var tag = await _context.Tags.FindAsync(id);
@@ -81,7 +64,6 @@ namespace aqay_apis
             await _context.SaveChangesAsync();
             return tag;
         }
-
         public async Task<bool> DeleteTagAsync(int id)
         {
             var tag = await _context.Tags.FindAsync(id);

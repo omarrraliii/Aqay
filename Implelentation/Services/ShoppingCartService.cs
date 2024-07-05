@@ -9,14 +9,18 @@ namespace aqay_apis.Services
         {
             _context = context;
         }
-        public async Task<int> CreateAsync()
+        public async Task<int> CreateAsync(string ConsumerId)
         {
+            var consumer = await _context.Consumers.FindAsync(ConsumerId);
+            if (consumer == null) {
+                throw new Exception("Consumer not found");
+            }
             var shoppingCart = new ShoppingCart()
             {
+                Consumer = consumer,
                 TotalPrice = 0,
-                ConsumerId = null,
-                DeliveryFees = 0,
-                ProductVariantIds = new List<int>()
+                ConsumerId = ConsumerId,
+                DeliveryFees = 0
             };
             await _context.ShoppingCarts.AddAsync(shoppingCart);
             await _context.SaveChangesAsync();

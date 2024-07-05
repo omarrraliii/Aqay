@@ -8,7 +8,11 @@ public class ShoppingCart
 {
     public int Id { get; set;}
     public double TotalPrice { get; set;}
-    public string? ConsumerId { get; set;}
     public double DeliveryFees { get; set; }
     public IList<int> ProductVariantIds { get; set; } = new List<int>();
+
+
+    // Relationships
+    public string ConsumerId { get; set; }
+    public Consumer Consumer { get; set; }
 }

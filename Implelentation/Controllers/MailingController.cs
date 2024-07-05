@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 namespace aqay_apis;
-
+//[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("api/[controller]")]
 public class MailingController:ControllerBase

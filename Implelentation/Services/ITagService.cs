@@ -1,7 +1,6 @@
 ﻿using aqay_apis.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 namespace aqay_apis
 {
     public interface ITagService

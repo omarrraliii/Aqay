@@ -12,6 +12,6 @@ namespace aqay_apis.Models
         public List<string> Roles { get; set; }
         public string Token { get; set; }
         public DateTime ExpiresOn { get; set; }
-        public bool isSub { get; set; } = false;
+        public bool isSubscribed { get; set; } = false;
     }
 }

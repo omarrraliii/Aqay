@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using aqay_apis.Dashboards;
-using aqay_apis.Models; // Assuming MerchantDashboardStatistics and other models are defined here
-
+using Microsoft.AspNetCore.Authorization;
 namespace aqay_apis.Controllers
 {
+    //[Authorize(Roles = "Merchant")]
     [Route("api/[controller]")]
     [ApiController]
     public class MerchantDashboardController : ControllerBase
@@ -19,8 +18,14 @@ namespace aqay_apis.Controllers
         [HttpGet("statistics/")]
         public async Task<ActionResult<MerchantDashboardStatistics>> GetDashboardStatistics([FromQuery] int brandId)
         {
-            var dashboardStatistics = await _merchantDashboardService.GetDashboardStatistics(brandId);
-            return Ok(dashboardStatistics);
+            try
+            {
+                var dashboardStatistics = await _merchantDashboardService.GetDashboardStatistics(brandId);
+                return Ok(dashboardStatistics);
+            }
+            catch (Exception ex) { 
+                return BadRequest(ex.Message);
+            }
         }
 
     }

@@ -20,8 +20,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString)
 );
 
-// Introduce global variable service
-builder.Services.AddSingleton<GlobalVariables>();
 
 // Introduce Identity User for custom user management
 builder.Services.AddIdentity<User, IdentityRole>()
@@ -107,10 +105,6 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
-
-// Initialize global variables
-var globalVariables = app.Services.GetRequiredService<GlobalVariables>();
-globalVariables.PageSize = 10;
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())

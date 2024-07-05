@@ -1,5 +1,4 @@
 ﻿namespace aqay_apis;
-
 public class FAQ
 {
     public int Id { get; set; }

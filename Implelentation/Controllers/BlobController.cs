@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using aqay_apis.Services;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-
 namespace aqay_apis.Controllers
 {
     [ApiController]

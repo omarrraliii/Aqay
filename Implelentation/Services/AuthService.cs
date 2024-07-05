@@ -8,7 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
 namespace aqay_apis.Services
 {
     public class AuthService : IAuthService
@@ -35,26 +34,22 @@ namespace aqay_apis.Services
         {
             var authModel = new AuthModel();
             var user = await _userManager.FindByEmailAsync(model.Email);
-
             if (user == null)
             {
                 authModel.Message = "No such email found!";
                 return authModel;
             }
-
             var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!isPasswordCorrect)
             {
                 authModel.Message = "Incorrect password!";
                 return authModel;
             }
-
             if (!user.IsActive)
             {
                 authModel.Message = "User is inactive. Cannot log in.";
                 return authModel;
             }
-
             // Check if the user is a merchant and is subscribed
             if (await _userManager.IsInRoleAsync(user, "Owner"))
             {
@@ -66,22 +61,20 @@ namespace aqay_apis.Services
                 }
                 if (merchant.IsSubscriped)
                 {
-                    authModel.isSub = true;
+                    authModel.isSubscribed = true;
                 }
                 else
                 {
                     authModel.Message = "User is a merchant but not subscribed.";
-                    authModel.isSub = false;
+                    authModel.isSubscribed = false;
                 }
 
             }
             else
             {
-                authModel.isSub = true;
+                authModel.isSubscribed = true;
             }
-
             var jwtSecurityToken = await CreateJwtToken(user);
-
             authModel.IsAuthenticated = true;
             authModel.Email = user.Email;
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
@@ -89,78 +82,90 @@ namespace aqay_apis.Services
             authModel.UserName = user.UserName;
             var roles = await _userManager.GetRolesAsync(user);
             authModel.Roles = roles.ToList();
-
             return authModel;
         }
         public async Task<AuthModel> SignupConsumerAsync(SignupConsumerModel model)
         {
-            // first check if there is a consumer with the same email
-            if (await  _userManager.FindByEmailAsync(model.Email) is not null)
+            // Check if the email is already registered
+            if (await _userManager.FindByEmailAsync(model.Email) != null)
             {
-                return new AuthModel { Message = "Email is already registered!" };
+                return new AuthModel
+                {
+                    Message = "Email is already registered!"
+                };
+            }
+
+            // Check if the password and password confirmation match
+            if (model.Password != model.PasswordConfirm)
+            {
+                return new AuthModel
+                {
+                    Message = "Passwords don't match!"
+                };
             }
 
             // Extract username from email
             string[] emailParts = model.Email.Split('@');
             string userName = emailParts[0];
 
-
-            // Create a shopping cart and link it with the consumer
-            var shoppingCartId = await _shoppingCartService.CreateAsync();
-            var shoppingCart = await _shoppingCartService.ReadByIdAsync(shoppingCartId);
-
-            // if it doesn't exsist then create a new merchant 
+            // Create a new Consumer object
             var consumer = new Consumer
             {
                 Email = model.Email,
                 UserName = userName,
                 Gender = model.Gender,
                 DateOfBirth = model.DateOfBirth,
-                ShoppingCartId = shoppingCartId,
             };
-            // if the password and the password Confirm didn't match
-            if (model.Password != model.PasswordConfirm)
-            {
-                var error = "Passwords Don't Match!";
-                return new AuthModel { Message = error };
-            }
 
-            // register the new consumer in the db
+            // Attempt to create the new consumer
             var result = await _userManager.CreateAsync(consumer, model.Password);
-
-            // add the user to a role consumer Automatically
-            await  _userManager.AddToRoleAsync(consumer, "Consumer");
-
-            // Create a wishlist and link it with the consumer
-            var wishList = await _wishListService.CreateWishListAsync(consumer);
-            consumer.WishList = wishList;
-            consumer.WishListId = wishList.Id;
-            await _userManager.UpdateAsync(consumer);
-            await _context.SaveChangesAsync();
-
-            
-            shoppingCart.ConsumerId = consumer.Id;
-            _context.Update(shoppingCart);
-            await _context.SaveChangesAsync();
-
-            // Update the shopping cart with the consumer ID
-            await _shoppingCartService.SetConsumerIdAsync(shoppingCartId, consumer.Id);
-
-            // Create a User Token to Login after SignUp
-            var jwtSecurityToken = await CreateJwtToken(consumer);
-
-            // print all errors if any
             if (!result.Succeeded)
             {
-                var errors = " ";
-                foreach (var error in result.Errors)
+                // Return error message if creation fails
+                return new AuthModel
                 {
-                    errors += $"{error.Description}\n";
-                }
-                return new AuthModel { Message = errors };
-
+                    Message = "Failed to create consumer. Please try again."
+                };
             }
 
+            // Add the consumer to the "Consumer" role
+            await _userManager.AddToRoleAsync(consumer, "Consumer");
+
+            // Create a new shopping cart for the consumer
+            var shoppingCartId = await _shoppingCartService.CreateAsync(consumer.Id);
+            var shoppingCart = await _shoppingCartService.ReadByIdAsync(shoppingCartId);
+
+            // Add the shopping cart to the consumer's carts
+            consumer.ShoppingCarts.Add(shoppingCart);
+
+            // Create a wishlist for the consumer
+            var wishList = await _wishListService.CreateWishListAsync(consumer);
+            consumer.WishList = wishList;
+
+            // Update the shopping cart with the consumer ID
+            shoppingCart.ConsumerId = consumer.Id;
+            _context.Update(shoppingCart);
+
+            try
+            {
+                // Save changes to the database
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Handle specific database update exceptions here
+                // Log or handle the exception as needed
+                return new AuthModel
+                {
+                    Message = "An error occurred while saving changes."
+                };
+            }
+
+            // Create a JWT token for the consumer
+            var jwtSecurityToken = await CreateJwtToken(consumer);
+
+            // Return successful authentication response
+            // Return authentication details upon successful signup
             return new AuthModel
             {
                 Email = consumer.Email,
@@ -169,12 +174,16 @@ namespace aqay_apis.Services
                 Roles = new List<string> { "Consumer" },
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 UserName = userName,
-                isSub = true
+                isSubscribed = true
             };
-
         }
         public async Task<string> SignupMerchantAsync(SignupMerchantModel model)
         {
+            // if the password and the password Confirm didn't match
+            if (model.Password != model.PasswordConfirm)
+            {
+                return "Passwords Don't Match!";
+            }
             bool IsValid = false;
             bool TRN = false;
             bool NAT = false;
@@ -201,7 +210,7 @@ namespace aqay_apis.Services
             }
             else
             {
-                return "Only one is needed";
+                return "Only one ID is needed";
             }
             if (!IsValid)
             {
@@ -216,7 +225,6 @@ namespace aqay_apis.Services
             // Extract username from email
             string[] emailParts = model.Email.Split('@');
             string userName = emailParts[0];
-
             // pending merchant 
             PendingMerchant pendingMerchant = new PendingMerchant
             {
@@ -228,19 +236,12 @@ namespace aqay_apis.Services
                 BrandName = model.BrandName,
                 phoneNumber = model.PhoneNumber
             };
-
-            // if the password and the password Confirm didn't match
-            if (model.Password != model.PasswordConfirm)
-            {
-                return "Passwords Don't Match!";
-            }
             // register the new pending merchant in the db
             _context.PendingMerchants.Add(pendingMerchant);
             await _context.SaveChangesAsync();
             return "keep an eye on Your Email .. your account is being validated";
 
         }
-
         //Create a user token
         public async Task<JwtSecurityToken> CreateJwtToken(User user)
         {

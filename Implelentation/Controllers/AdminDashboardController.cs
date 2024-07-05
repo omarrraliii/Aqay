@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using aqay_apis.Dashboards;
-using aqay_apis.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace aqay_apis.Controllers
 {
+    //[Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class AdminDashboardController : ControllerBase

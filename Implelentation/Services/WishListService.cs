@@ -8,13 +8,10 @@ namespace aqay_apis;
 public class WishListService : IWishListService
 {
     private ApplicationDbContext _context;
-    private GlobalVariables _globalVariables;
-    public WishListService(ApplicationDbContext context, GlobalVariables globalVariables)
+    public WishListService(ApplicationDbContext context)
     {
         _context = context;
-        _globalVariables = globalVariables;
     }
-
     public async Task<WishList> AddProductToWishList(int id, int productId)
     {
         var wishList= await _context.WishLists.Include(w=>w.Products)
@@ -34,7 +31,6 @@ public class WishListService : IWishListService
         await _context.SaveChangesAsync();
         return wishList;
     }
-
     public async Task<WishList> CreateWishListAsync(Consumer consumer)
     {
         var wishList=new WishList
@@ -45,7 +41,6 @@ public class WishListService : IWishListService
         await _context.SaveChangesAsync();
         return wishList;
     }
-
     public async Task<bool> DeleteWishListAsync(int id)
     {
         var wishList = await _context.WishLists.FindAsync(id);
@@ -58,8 +53,7 @@ public class WishListService : IWishListService
         await _context.SaveChangesAsync();
         return true;
     }
-
-    public async Task<PaginatedResult<Product>> GetWishListByIdAsync(int id,int pageindex)
+    public async Task<IEnumerable<Product>> GetWishListByIdAsync(int id)
     {
         var wishList=await _context.WishLists.Include(w=>w.Products)
                                             .FirstOrDefaultAsync(w=>w.Id==id);
@@ -67,20 +61,9 @@ public class WishListService : IWishListService
         {
             throw new Exception($"{id} was not found.");
         }
-        var products=wishList.Products.OrderByDescending(p=>p.Name)
-                        .Skip((pageindex-1)*_globalVariables.PageSize)
-                        .Take(_globalVariables.PageSize)
+        return wishList.Products.OrderByDescending(p=>p.Name)
                         .ToList();
-        var productCount=wishList.Products.Count;
-        var PaginatedResult=new PaginatedResult<Product>
-        {
-            Items=products,
-            TotalCount=productCount,
-            HasMoreItems=(pageindex*_globalVariables.PageSize)<productCount
-        };
-        return PaginatedResult;
     }
-
     public async Task<WishList> RemoveProductFromWishList(int id, int productId)
     {
         var wishList=await _context.WishLists.Include(w=>w.Products)

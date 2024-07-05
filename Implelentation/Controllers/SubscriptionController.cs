@@ -1,4 +1,5 @@
 ﻿using aqay_apis.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace aqay_apis.Controllers
 {
@@ -16,21 +17,35 @@ namespace aqay_apis.Controllers
         [HttpGet("plans")]
         public async Task<ActionResult<ICollection<Plan>>> GetAllPlans()
         {
-            var plans = await _subscriptionService.GetAllPlansAsync();
-            return Ok(plans);
+            try
+            {
+                var plans = await _subscriptionService.GetAllPlansAsync();
+                return Ok(plans);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("plans/{id}")]
         public async Task<ActionResult<Plan>> GetPlanById(int id)
         {
-            var plan = await _subscriptionService.GetPlanByIdAsync(id);
-            if (plan == null)
+            try
             {
-                return NotFound();
+                var plan = await _subscriptionService.GetPlanByIdAsync(id);
+                if (plan == null)
+                {
+                    return NotFound();
+                }
+                return Ok(plan);
             }
-            return Ok(plan);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-
+        //[Authorize(Roles = "Owner")]
         [HttpPost("subscribe")]
         public async Task<IActionResult> Subscribe(string userId, int planId)
         {

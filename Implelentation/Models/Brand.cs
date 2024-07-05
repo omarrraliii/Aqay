@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace aqay_apis.Models
+﻿namespace aqay_apis.Models
 {
     public class Brand
     {
@@ -13,14 +11,12 @@ namespace aqay_apis.Models
         public string? Instagram { get; set; }
         public string? Facebook { get; set; }
         public string? WPNumber { get; set; }
-        // one-to-one relationship
-        public string? BrandOwnerId { get; set; }
-        public Merchant? BrandOwner { get; set; } //navigation property
-        //one to many relationship with Products
-        public ICollection<Product>? Products { get; set; }
-        //one to one relationship with About
         public string? About { get; set; }
         public string? LogoUrl { get; set; }
+        // Relationships
+        public string BrandOwnerId { get; set; }
+        public Merchant BrandOwner { get; set; }
+        public ICollection<Product>? Products { get; set; }
 
     }
 }

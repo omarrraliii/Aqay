@@ -1,6 +1,5 @@
 ﻿using aqay_apis.Dtos;
 using aqay_apis.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace aqay_apis.Controllers

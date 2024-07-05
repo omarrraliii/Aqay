@@ -11,19 +11,16 @@ namespace aqay_apis.controllers
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
- 
         public CategoriesController(ICategoryService categoryService)
         {
             _categoryService = categoryService;
         }
-
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> getCategories(int page = 1)
+        public async Task<ActionResult<IEnumerable<Category>>> getCategories()
         {
-            var categories = await _categoryService.getCategories(page);
+            var categories = await _categoryService.getCategories();
             return Ok(categories);
         }
-
         [HttpGet("id")]
         public async Task<ActionResult<Category>> getCategoryById(int id)
         {
@@ -34,7 +31,6 @@ namespace aqay_apis.controllers
             }
             return Ok(category);
         }
-
         [HttpGet("name")]
         public async Task<ActionResult<Category>> getCategoryByName(string name)
         {
@@ -45,44 +41,55 @@ namespace aqay_apis.controllers
             }
             return Ok(category);
         }
-
         [HttpPost]
-        //[Authorize(Roles = "owner, admin")]
+        //[Authorize(Roles = "Owner, Admin")]
         public async Task<ActionResult<Category>> createCategory(string name)
         {
             try
             {
                 var createdCategory = await _categoryService.createCategory(name);
-                return CreatedAtAction(nameof(getCategoryById), new { id = createdCategory.Id }, createdCategory);
+                return Ok(createdCategory);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
         }
-
         [HttpPut]
-        //[Authorize(Roles = "owner, admin")]
+        //[Authorize(Roles = "Owner, Admin")]
         public async Task<IActionResult> updateCategory(string oldName,string newName)
         {
-            var updatedCategory = await _categoryService.updateCategory(oldName, newName);
-            if (updatedCategory == null)
+            try
             {
-                return NotFound();
+                var updatedCategory = await _categoryService.updateCategory(oldName, newName);
+                if (updatedCategory == null)
+                {
+                    return NotFound();
+                }
+                return Ok(updatedCategory);
             }
-            return Ok(updatedCategory);
-        }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
 
+        }
         [HttpDelete]
-        //[Authorize(Roles = "owner, admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> deleteCategory(string name)
         {
-            var result = await _categoryService.deleteCategory(name);
-            if (!result)
+            try
             {
-                return NotFound();
+                var result = await _categoryService.deleteCategory(name);
+                if (!result)
+                {
+                    return NotFound();
+                }
+                return NoContent();
             }
-            return NoContent();
+            catch (Exception ex) {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

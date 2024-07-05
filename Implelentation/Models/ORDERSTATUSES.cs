@@ -1,5 +1,4 @@
 ﻿namespace aqay_apis;
-
 public enum ORDERSTATUSES
 {
     PENDING = 0 ,

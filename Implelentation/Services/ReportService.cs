@@ -6,11 +6,9 @@ namespace aqay_apis;
 public class ReportService:IReportService
 {
     private readonly ApplicationDbContext _context;
-    private readonly GlobalVariables _globalVariables;
-    public ReportService(ApplicationDbContext context, GlobalVariables globalVariables)
+    public ReportService(ApplicationDbContext context)
     {
         _context = context;
-        _globalVariables = globalVariables;
     }
     public async Task<Report> CreateReportAsync(string title,string intiatorId,string description)
     {
@@ -27,21 +25,12 @@ public class ReportService:IReportService
         await _context.SaveChangesAsync();
         return report;
     }
-    public async Task<PaginatedResult<Report>> GetReportsAsync(int pageIndex)
+    public async Task<IEnumerable<Report>> GetReportsAsync()
     {
         var reports= await _context.Reports
                               .OrderByDescending(r=>r.CreatedOn)
-                              .Skip((pageIndex - 1) * _globalVariables.PageSize)
-                              .Take(_globalVariables.PageSize)
                               .ToListAsync();
-        var reportsCount= await _context.Reports.CountAsync();
-        var paginatedResult= new PaginatedResult<Report>
-        {
-            Items=reports,
-            TotalCount=reportsCount,
-            HasMoreItems=pageIndex*_globalVariables.PageSize <reportsCount
-        };
-        return paginatedResult;
+        return reports;
     }
     public async Task<Report> GetReportByIdAsync (int id)
     {
@@ -62,51 +51,43 @@ public class ReportService:IReportService
         }
         return report;
     }
-    public async Task<PaginatedResult<Report>> GetReportsByStatusAsync(REPORTSTATUSES REPORTSTATUS,int pageIndex)
+    public async Task<IEnumerable<Report>> GetReportsByStatusAsync(REPORTSTATUSES REPORTSTATUS)
     {
         List<Report> reports = new List<Report>();
         if (REPORTSTATUS == REPORTSTATUSES.OPEN)
         {
             reports=await _context.Reports
-                                .Skip((pageIndex-1)*_globalVariables.PageSize)
-                                .Take(_globalVariables.PageSize)
                                 .Where(r=>r.REPORTSTATUS==REPORTSTATUSES.OPEN)
                                 .ToListAsync();
         }
         else if (REPORTSTATUS == REPORTSTATUSES.CLOSED)
         {
             reports= await _context.Reports
-                                .Skip((pageIndex-1)*_globalVariables.PageSize)
-                                .Take(_globalVariables.PageSize)
                                 .Where(r=>r.REPORTSTATUS==REPORTSTATUSES.CLOSED)
                                 .ToListAsync();
         }
-        var reportsCount= await _context.Reports.CountAsync();
-        var paginatedResult= new PaginatedResult<Report>
-        {
-            Items=reports,
-            TotalCount=reportsCount,
-            HasMoreItems=pageIndex*_globalVariables.PageSize <reportsCount
-        };
-        return paginatedResult;
+        return reports;
     }
-
     public async Task<Report> OpenReportAsync(int id, string reviewerId)
     {
         var report = await _context.Reports.FindAsync(id);
+        if (report == null) {
+            throw new Exception("Report not found");
+        }
         if (report.ReviewerId == null)
         {
             report.ReviewerId = reviewerId;
             await _context.SaveChangesAsync();
             return report;
         }
-        
         return report;
     }
-
     public async Task<Report> UpdateReportActionAsync(int id,string? action)
     {
         var report= await _context.Reports.FindAsync(id);
+        if (report == null) {
+            throw new Exception("Report not found");
+        }
         if (action == null)
         {
             return report;
@@ -116,24 +97,25 @@ public class ReportService:IReportService
         await _context.SaveChangesAsync();
         return report;
     }
-
     public async Task<bool> DeleteReportAsync(int id)
     {
         var report= await _context.Reports.FindAsync(id);
         if (report==null)
         {
             return false;
-            throw new Exception("No report found");
+            throw new Exception("Report not found");
         }
         _context.Remove(report);
         await _context.SaveChangesAsync();
         return true;
 
     }
-
     public async Task<Report> UpdateReportStatusAsync(int id)
     {
         var report=await _context.Reports.FindAsync(id);
+        if (report == null) {
+            throw new Exception("Report not found");
+        }
         if (report.REPORTSTATUS==REPORTSTATUSES.CLOSED)
         {
             report.REPORTSTATUS=REPORTSTATUSES.OPEN;

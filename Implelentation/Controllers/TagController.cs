@@ -1,7 +1,5 @@
 ﻿using aqay_apis.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace aqay_apis.Controllers
 {

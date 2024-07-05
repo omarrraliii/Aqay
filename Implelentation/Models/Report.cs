@@ -1,5 +1,4 @@
 ﻿namespace aqay_apis;
-
 public class Report
 {
     public int Id { get; set; }

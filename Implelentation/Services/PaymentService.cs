@@ -1,15 +1,6 @@
-﻿using aqay_apis.Context;
-using aqay_apis.Models;
-using aqay_apis.Models.Paymob;
-using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.EntityFrameworkCore;
+﻿using aqay_apis.Models.Paymob;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Text;
 namespace aqay_apis.Services
 

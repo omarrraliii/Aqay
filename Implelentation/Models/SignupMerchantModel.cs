@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
 namespace aqay_apis.Models
 {
     public class SignupMerchantModel

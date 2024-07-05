@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using aqay_apis.Dtos;
-using aqay_apis.Models;
 using aqay_apis.Services;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using aqay_apis.Context;
 using Microsoft.CodeAnalysis;
+using Microsoft.AspNetCore.Authorization;
 namespace aqay_apis.Controllers
 {
     [Route("api/[controller]")]
@@ -23,22 +20,31 @@ namespace aqay_apis.Controllers
             _context = context;
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(int pageIndex = 1)
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            var products = await _productService.GetAllAsync(pageIndex);
-            return Ok(products);
+            try
+            {
+                var products = await _productService.GetAllAsync();
+                return Ok(products);
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpGet("id/")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _productService.GetByIdAsync(id);
-            if (product == null)
+            try
             {
-                return NotFound();
+                var product = await _productService.GetByIdAsync(id);
+                return Ok(product);
             }
-
-            return Ok(product);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+        [Authorize(Roles ="Owner, Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> AddProduct([FromBody] ProductDto productDto)
         {
@@ -52,6 +58,7 @@ namespace aqay_apis.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        //[Authorize(Roles = "Owner, Admin")]
         [HttpPut("product variant/")]
         public async Task<IActionResult> EditProductVariant(int variantId, [FromForm] ProductVariantDto variantDto)
         {
@@ -85,7 +92,9 @@ namespace aqay_apis.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+
         }
+        //[Authorize(Roles = "Owner, Admin")]
         [HttpPost("product variant/")]
         public async Task<IActionResult> AddProductVariant([FromForm] ProductVariantDto variantDto)
         {
@@ -115,6 +124,7 @@ namespace aqay_apis.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        //[Authorize(Roles = "Owner, Admin")]
         [HttpPut]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductDto productDto)
         {
@@ -128,6 +138,7 @@ namespace aqay_apis.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        //[Authorize(Roles = "Owner, Admin")]
         [HttpDelete]
         public async Task<IActionResult> DeleteProduct(int id)
         {
@@ -138,13 +149,12 @@ namespace aqay_apis.Controllers
             }
             return NoContent();
         }
-        /// productttt
         [HttpGet("variants/")]
-        public async Task<ActionResult<IEnumerable<ProductVariant>>> GetProductVariants(int productId,int pageIndex=1)
+        public async Task<ActionResult<IEnumerable<ProductVariant>>> GetProductVariants(int productId)
         {
             try
             {
-                var variants = await _productService.GetProductSpecsAsync(productId,pageIndex);
+                var variants = await _productService.GetProductSpecsAsync(productId);
                 return Ok(variants);
             }
             catch (Exception ex)
@@ -153,29 +163,55 @@ namespace aqay_apis.Controllers
             }
         }
         [HttpGet("brand/")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByBrand(int brandId, int pageIndex = 1)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByBrand(int brandId)
         {
-            var products = await _productService.GetProductsByBrandAsync(brandId, pageIndex);
-            return Ok(products);
+            try
+            {
+                var products = await _productService.GetProductsByBrandAsync(brandId);
+                return Ok(products);
+            }
+            catch (Exception ex) { 
+                return BadRequest(ex.Message);
+            }
         }
         [HttpGet("category/")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(string categoryName, int pageIndex = 1)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByCategory(string categoryName)
         {
-            var products = await _productService.GetProductsByCategoryAsync(categoryName, pageIndex);
-            return Ok(products);
+            try
+            {
+                var products = await _productService.GetProductsByCategoryAsync(categoryName);
+                return Ok(products);
+            }
+            catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpGet("name/")]
-        public async Task<ActionResult<PaginatedResult<ProductDto>>> GetProductsByName(string name, int pageIndex = 1)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByName(string name)
         {
-            var result = await _productService.GetProductsByName(name, pageIndex);
-            return Ok(result);
+            try
+            {
+                var result = await _productService.GetProductsByName(name);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("tag/")]
-        public async Task<ActionResult<PaginatedResult<ProductDto>>> GetProductsByTag(string tag, int pageIndex = 1)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProductsByTag(string tag)
         {
-            var result = await _productService.GetProductsByTag(tag, pageIndex);
-            return Ok(result);
+            try
+            {
+                var result = await _productService.GetProductsByTag(tag);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

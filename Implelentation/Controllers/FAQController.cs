@@ -11,9 +11,9 @@ public class FAQController:ControllerBase
         _faqService = fAQService;
     }
     [HttpGet("GetAllFAQ")]
-    public async Task<IActionResult> GetAllFAQs(int pageIndex)
+    public async Task<IActionResult> GetAllFAQs()
     {
-        var FAQs=await _faqService.GetAllFAQs(pageIndex);
+        var FAQs=await _faqService.GetAllFAQs();
         if (FAQs==null)
         {
             return NotFound();

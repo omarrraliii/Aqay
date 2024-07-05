@@ -16,7 +16,6 @@ namespace aqay_apis.Controllers
             _authService = authService;
         }
 
-
         // POST ENDPOINT: Sign up as a consumer 
         [HttpPost("SignupConsumer")]
         public async Task<IActionResult> SignupConsumerAsync([FromBody]SignupConsumerModel model)

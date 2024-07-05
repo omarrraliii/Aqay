@@ -1,9 +1,4 @@
 ﻿using Azure.Storage.Blobs;
-using Microsoft.Extensions.Configuration;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-
 namespace aqay_apis.Services
 {
     public class AzureBlobService : IAzureBlobService

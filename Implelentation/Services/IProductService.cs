@@ -4,16 +4,16 @@ namespace aqay_apis.Services
 {
     public interface IProductService
     {
-        Task<PaginatedResult<object>> GetAllAsync(int pageIndex);
+        Task<IEnumerable<object>> GetAllAsync();
         Task<Product> GetByIdAsync(int id);
         Task<int> AddAsync(ProductDto productDto);
         Task<int> UpdateAsync(int id, ProductDto productDto);
         Task<bool> DeleteAsync(int id);
-        Task<PaginatedResult<Product>> GetProductsByName (string name,int pageIndex);
-        Task<PaginatedResult<Product>> GetProductsByTag(string tag,int pageIndex);
-        Task<PaginatedResult<ProductVariant>> GetProductSpecsAsync(int productId,int pageIndex);
-        Task<PaginatedResult<Product>> GetProductsByBrandAsync(int brandId, int pageIndex);
-        Task<PaginatedResult<Product>> GetProductsByCategoryAsync(string categoryName, int pageIndex);
+        Task<IEnumerable<Product>> GetProductsByName (string name);
+        Task<IEnumerable<Product>> GetProductsByTag(string tag);
+        Task<IEnumerable<ProductVariant>> GetProductSpecsAsync(int productId);
+        Task<IEnumerable<Product>> GetProductsByBrandAsync(int brandId);
+        Task<IEnumerable<Product>> GetProductsByCategoryAsync(string categoryName);
 
     }
 }

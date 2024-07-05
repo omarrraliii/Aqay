@@ -13,8 +13,6 @@ public class Product
     public DateTime LastEdit { get; set; }
     public int Rate { get; set; } = 0;
     public int ReviewCount { get; set; } = 0;
-
-    //many to many relationship with Tags
     public ICollection<Tag> Tags{ get; set; }
     //one to many relationship with Category
     public int CategoryId { get; set; }
