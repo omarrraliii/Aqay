@@ -29,14 +29,17 @@ namespace aqay_apis.Services
             {
                 return "Pending merchant not found";
             }
+
             // Check if there is already a user with the same email
             if (await _userManager.FindByEmailAsync(pendingMerchant.Email) != null)
             {
                 return "Email is already registered!";
             }
+
             // Extract username from email
             string[] emailParts = pendingMerchant.Email.Split('@');
             string userName = emailParts[0];
+
             // Create a new Merchant object
             var newMerchant = new Merchant
             {
@@ -48,21 +51,29 @@ namespace aqay_apis.Services
                 BrandName = pendingMerchant.BrandName,
                 PhoneNumber = pendingMerchant.phoneNumber
             };
+
             // Attempt to create the new user
             var result = await _userManager.CreateAsync(newMerchant, pendingMerchant.Password);
             if (!result.Succeeded)
             {
-                return "Failed to create merchant. Please try again.";
+                // Log the errors
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return $"Failed to create merchant. Errors: {errors}. Please try again.";
             }
+
             // Add the user to the "Owner" role
             await _userManager.AddToRoleAsync(newMerchant, "Owner");
+
             // Create a brand and link it with the accepted merchant
             var brand = await _brandService.CreateBrandAsync(newMerchant.Id);
+
             // Update the new merchant with the created brand
             newMerchant.Brand = brand;
             await _userManager.UpdateAsync(newMerchant);
+
             // Remove the pending merchant from the context
             _context.Set<PendingMerchant>().Remove(pendingMerchant);
+
             try
             {
                 // Save changes to the database
@@ -74,8 +85,10 @@ namespace aqay_apis.Services
                 // Log or handle the exception as needed
                 return "An error occurred while saving changes.";
             }
+
             return "Merchant accepted. Proceed to the subscription page.";
         }
+
         public async Task<string> RejectMerchantAsync(int pendingMerchantId)
         {
             var pendingMerchant = await _context.Set<PendingMerchant>().FindAsync(pendingMerchantId);

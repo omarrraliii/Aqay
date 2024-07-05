@@ -24,4 +24,6 @@ public class Product
     public Brand Brand { get; set; }
     //one to many relationship with product Variants
     public ICollection<ProductVariant> ProductVariants { get; set; }
+    public string categoryName { get; set; }
+    
 }

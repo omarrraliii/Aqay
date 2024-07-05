@@ -6,5 +6,6 @@ public enum ORDERSTATUSES
     SHIPPED = 2,
     DELIVERED = 3,
     EXCHANGE = 4,
-    REFUND = 5
+    REFUND = 5,
+    REQUIST = 6,
 }

@@ -44,7 +44,7 @@ namespace aqay_apis.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [Authorize(Roles ="Owner, Admin")]
+        //[Authorize(Roles ="Owner, Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> AddProduct([FromBody] ProductDto productDto)
         {

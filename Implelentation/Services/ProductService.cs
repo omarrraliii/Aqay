@@ -68,6 +68,7 @@ namespace aqay_apis.Services
                 CategoryId = productDto.CategoryId,
                 BrandId = productDto.BrandId,
                 ProductVariants = null,
+                categoryName = productDto.categoryName,
                 Tags = new List<Tag>()
             };
             if (productDto.TagName != null && productDto.TagName.Any())

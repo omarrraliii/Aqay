@@ -10,6 +10,7 @@ namespace aqay_apis.Services
         private readonly IProductVariantService _productVariantService;
         private readonly IProductService _productService;
         private readonly IShoppingCartService _shoppingCartService;
+   
         public OrderService(ApplicationDbContext context, IProductVariantService productVariantService, IProductService productService, IShoppingCartService shoppingCartService)
         {
             _context = context;
@@ -55,8 +56,25 @@ namespace aqay_apis.Services
         public async Task<Order> CreateOrderAsync(string consumerId, int productVariantId, string address)
         {
             var productVariant = await _context.ProductVariants.FindAsync(productVariantId);
+            if (productVariant == null)
+            {
+                throw new Exception("Product Variant not found");
+            }
+
             var product = await _context.Products.FindAsync(productVariant.ProductId);
+            if (product == null)
+            {
+                throw new Exception("Product not found");
+            }
+
             var consumer = await _context.Users.FindAsync(consumerId);
+            if (consumer == null)
+            {
+                throw new Exception("Consumer not found");
+            }
+            var brand = await _context.Brands.FindAsync(product.BrandId);
+            var brandName = (brand == null) ? " " : brand.Name;
+            var consumerName = (consumer.UserName == null) ? " " : consumer.UserName;
             var newOrder = new Order
             {
                 ConsumerId = consumerId,
@@ -65,18 +83,19 @@ namespace aqay_apis.Services
                 CreatedOn = DateTime.Now,
                 LastEdit = DateTime.Now,
                 BrandId = product.BrandId,
-                BrandName=product.Brand.Name,
+                BrandName = brandName,
                 ProductVariantId = productVariantId,
                 Address = address,
                 ProductName = product.Name,
-                ConsumerName = consumer.UserName,
+                ConsumerName = consumerName,
                 ConsumerGender = consumer.Gender
-
             };
-            _context.Orders.Add(newOrder);
+            await _context.Orders.AddAsync(newOrder);
             await _context.SaveChangesAsync();
+
             return newOrder;
         }
+
         public async Task<bool> AcceptOrderAsync(int orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
@@ -185,6 +204,7 @@ namespace aqay_apis.Services
                 }
                 _context.Orders.Update(order);
             }
+
             // Remove the shopping cart
             await _shoppingCartService.DeleteAsync(shoppingCartId);
 

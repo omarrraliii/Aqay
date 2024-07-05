@@ -8,5 +8,6 @@
         public int CategoryId { get; set; }
         public int BrandId { get; set; }
         public ICollection<string>? TagName { get; set; }
+        public string categoryName { get; set; }
     }
 }
