@@ -77,7 +77,7 @@ namespace aqay_apis.Controllers
             }
         }
         [HttpPost("shoppingCartId/removeProduct")]
-        public async Task<ActionResult<bool>> RemoveProductVariant(int shoppingCartId, [FromBody] int productVariantId)
+        public async Task<ActionResult<bool>> RemoveProductVariant(int shoppingCartId, int productVariantId)
         {
             try
             {
