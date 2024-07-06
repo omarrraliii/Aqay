@@ -7,6 +7,6 @@ public interface IWishListService
     Task<WishList> CreateWishListAsync (Consumer consumer);
     Task<WishList> AddProductToWishList(int id,int productId);
     Task<WishList> RemoveProductFromWishList(int id,int productId);
-    Task<IEnumerable<Product>> GetWishListByIdAsync(int id);
+    Task<IEnumerable<Product>> GetWishListByIdAsync(string id);
     Task<bool> DeleteWishListAsync (int id);
 }

@@ -53,12 +53,13 @@ public class WishListService : IWishListService
         await _context.SaveChangesAsync();
         return true;
     }
-    public async Task<IEnumerable<Product>> GetWishListByIdAsync(int id)
+    public async Task<IEnumerable<Product>> GetWishListByIdAsync(string id)
     {
         var wishList=await _context.WishLists.Include(w=>w.Products)
-                                            .FirstOrDefaultAsync(w=>w.Id==id);
+                                            .FirstOrDefaultAsync(w=>w.ConsumerId==id);
         if (wishList == null)
         {
+            return null;
             throw new Exception($"{id} was not found.");
         }
         return wishList.Products.OrderByDescending(p=>p.Name)

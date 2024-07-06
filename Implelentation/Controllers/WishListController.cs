@@ -48,14 +48,14 @@ namespace aqay_apis.Controllers
             }
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetWishListById(int id)
+        public async Task<IActionResult> GetWishListById(string id)
         {
             try
             {
                 var wishList = await _wishListService.GetWishListByIdAsync(id);
                 if (wishList == null)
                 {
-                    return NotFound($"WishList with ID {id} not found.");
+                    return NotFound($"WishList with Consumer ID {id} not found.");
                 }
                 return Ok(wishList);
             }
