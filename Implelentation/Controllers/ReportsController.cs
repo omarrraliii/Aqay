@@ -14,19 +14,19 @@ public class ReportsController : ControllerBase
         _reportService = reportService;
         _adminService = adminService;
     }
-    [HttpPost]
-    public async Task<IActionResult> CreateReport(string title, string intiatorId, [FromBody] string description)
+    [HttpPost("CreateReport")]
+public async Task<IActionResult> CreateReport([FromBody] ReportDto request)
+{
+    try
     {
-        try
-        {
-            var report = await _reportService.CreateReportAsync(title, intiatorId, description);
-            return CreatedAtAction(nameof(GetReportById), new { id = report.Id }, report);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        var report = await _reportService.CreateReportAsync(request.Title, request.InitiatorId, request.Description);
+        return CreatedAtAction(nameof(GetReportById), new { id = report.Id }, report);
     }
+    catch (Exception ex)
+    {
+        return BadRequest(new { message = ex.Message });
+    }
+}
     [HttpGet]
     public async Task<IActionResult> GetReports()
     {
