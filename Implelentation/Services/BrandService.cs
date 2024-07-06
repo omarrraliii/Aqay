@@ -110,5 +110,18 @@ namespace aqay_apis
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<int> GetBrandIdBy(string name)
+        {
+            var brand = await _context.Brands
+                              .Where(b => b.Name == name)
+                              .FirstOrDefaultAsync();
+
+            if (brand == null)
+            {
+                throw new KeyNotFoundException($"Brand with name '{name}' not found.");
+            }
+            return brand.Id;
+        }
     }
 }

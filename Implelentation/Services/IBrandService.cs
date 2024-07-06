@@ -6,6 +6,7 @@ public interface IBrandService
 {
     Task<Brand> CreateBrandAsync(string BrandOwnerId);
     Task<Brand> GetBrandByIdAsync(int id);
+    Task<int> GetBrandIdBy(string name);
     Task<IEnumerable<Brand>> GetAllBrandsAsync();
     Task<Brand> EditProfileAsync(int id, BrandDto brandDto);
     Task<bool> DeleteBrandAsync(int id);
