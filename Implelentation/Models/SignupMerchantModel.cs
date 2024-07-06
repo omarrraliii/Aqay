@@ -15,5 +15,7 @@ namespace aqay_apis.Models
         public string? TaxRegistrationNumber { get; set; }
         public string? NationalId { get; set; }
         public string BrandName { get; set; }
+        public DateOnly DateOfBirth { get; set; }
+
     }
 }

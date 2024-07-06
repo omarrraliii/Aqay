@@ -177,12 +177,12 @@ namespace aqay_apis.Services
                 isSubscribed = true
             };
         }
-        public async Task<string> SignupMerchantAsync(SignupMerchantModel model)
+        public async Task<AuthModel> SignupMerchantAsync(SignupMerchantModel model)
         {
             // if the password and the password Confirm didn't match
             if (model.Password != model.PasswordConfirm)
             {
-                return "Passwords Don't Match!";
+                return new AuthModel { Message = "Passwords Don't Match!" };
             }
             bool IsValid = false;
             bool TRN = false;
@@ -190,12 +190,12 @@ namespace aqay_apis.Services
             // first check if there is a merchant with the same email
             if (await  _userManager.FindByEmailAsync(model.Email) is not null)
             {
-                return "Email is already registered!";
+                return new AuthModel { Message = "Email is already registered!" };
             }
             // check if one of the IDs is provided ( only one)
             if (model.NationalId == null && model.TaxRegistrationNumber == null)
             {
-                return "National ID or Tax Registration Number Must be provided";
+                return new AuthModel { Message = "National ID or Tax Registration Number Must be provided" };
             }
             // National Id is provided 
             else if (!string.IsNullOrEmpty(model.NationalId) && string.IsNullOrEmpty(model.TaxRegistrationNumber)) {
@@ -210,11 +210,11 @@ namespace aqay_apis.Services
             }
             else
             {
-                return "Only one ID is needed";
+                return new AuthModel { Message = "Only one ID is needed" };
             }
             if (!IsValid)
             {
-                return "non Valid!";
+                return new AuthModel { Message = "non Valid!" };
             }
             if (NAT)
             {
@@ -234,14 +234,15 @@ namespace aqay_apis.Services
                 NATID = (NAT)? model.NationalId : null,
                 TRN = (TRN)? model.TaxRegistrationNumber : null,
                 BrandName = model.BrandName,
-                phoneNumber = model.PhoneNumber
+                phoneNumber = model.PhoneNumber,
+                DateOfBirth = model.DateOfBirth,
             };
             // register the new pending merchant in the db
             _context.PendingMerchants.Add(pendingMerchant);
             await _context.SaveChangesAsync();
-            return "keep an eye on Your Email .. your account is being validated";
+            return new AuthModel { Message = "keep an eye on Your Email .. your account is being validated" };
 
-        }
+            }
         //Create a user token
         public async Task<JwtSecurityToken> CreateJwtToken(User user)
         {

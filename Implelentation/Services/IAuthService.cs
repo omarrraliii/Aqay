@@ -4,7 +4,7 @@ namespace aqay_apis.Services
 {
     public interface IAuthService
     {
-        Task<string> SignupMerchantAsync(SignupMerchantModel model);
+        Task<AuthModel> SignupMerchantAsync(SignupMerchantModel model);
         Task<AuthModel> SignupConsumerAsync(SignupConsumerModel model);
 
         // Log in = Get Token (fetsh the token to allow authentication)

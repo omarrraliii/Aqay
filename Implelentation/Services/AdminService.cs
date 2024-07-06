@@ -49,7 +49,8 @@ namespace aqay_apis.Services
                 IsOwner = true,
                 IsSubscriped = false,
                 BrandName = pendingMerchant.BrandName,
-                PhoneNumber = pendingMerchant.phoneNumber
+                PhoneNumber = pendingMerchant.phoneNumber,
+                DateOfBirth = pendingMerchant.DateOfBirth
             };
 
             // Attempt to create the new user
@@ -88,7 +89,6 @@ namespace aqay_apis.Services
 
             return "Merchant accepted. Proceed to the subscription page.";
         }
-
         public async Task<string> RejectMerchantAsync(int pendingMerchantId)
         {
             var pendingMerchant = await _context.Set<PendingMerchant>().FindAsync(pendingMerchantId);

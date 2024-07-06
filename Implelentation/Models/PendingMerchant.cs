@@ -9,5 +9,6 @@
         public string? TRN { get; set; }
         public string BrandName { get; set; }
         public string phoneNumber { get; set; }
+        public DateOnly DateOfBirth { get; set; }
     }
 }
