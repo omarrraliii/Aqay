@@ -1,4 +1,5 @@
 ﻿using aqay_apis.Context;
+using aqay_apis.Dtos;
 using Microsoft.EntityFrameworkCore;
 namespace aqay_apis.Services
 {
@@ -12,7 +13,8 @@ namespace aqay_apis.Services
         public async Task<int> CreateAsync(string ConsumerId)
         {
             var consumer = await _context.Consumers.FindAsync(ConsumerId);
-            if (consumer == null) {
+            if (consumer == null)
+            {
                 throw new Exception("Consumer not found");
             }
             var shoppingCart = new ShoppingCart()
@@ -80,23 +82,36 @@ namespace aqay_apis.Services
             }
             return false;
         }
-        public async Task<IList<ProductVariant>> GetProductVariantsAsync(int shoppingCartId)
+        public async Task<IList<ProductVariantDto>> GetProductVariantsAsync(int shoppingCartId)
         {
 
             // retrive cart object
             var cart = await _context.ShoppingCarts.FindAsync(shoppingCartId);
             IList<int> productVariantsIds = cart.ProductVariantIds;
-        
+
             if (cart == null) return null;
-            IList<ProductVariant> productVariants = new List<ProductVariant>();
+            IList<ProductVariantDto> productVariants = new List<ProductVariantDto>();
             foreach (var id in productVariantsIds)
             {
                 var variant = await _context.ProductVariants.FindAsync(id);
-                if (variant!= null)
+                if (variant != null)
                 {
-                    productVariants.Add(variant);
+                    var product = await _context.Products.FindAsync(variant.ProductId);
+                    if (product != null)
+                    {
+                        ProductVariantDto productVariantDto = new ProductVariantDto
+                        {
+                            Size = variant.Size,
+                            Color = variant.Color,
+                            Quantity = variant.Quantity,
+                            ProductId = variant.ProductId,
+                            Price = product.Price,
+                            ImgUrl = variant.ImageUrl,
+                        };
+                        productVariants.Add(productVariantDto);
+                    }
                 }
-                
+
             }
             return productVariants;
         }

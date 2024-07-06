@@ -1,4 +1,5 @@
-﻿using aqay_apis.Models;
+﻿using aqay_apis.Dtos;
+using aqay_apis.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace aqay_apis.Services
         Task<ICollection<ShoppingCart>> ReadAllAsync();
         Task<bool> AddProductVariantAsync(int shoppingCartId, int productVariantId);
         Task<bool> RemoveProductVariantAsync(int shoppingCartId, int productVariantId);
-        Task<IList<ProductVariant>> GetProductVariantsAsync(int shoppingCartId);
+        Task<IList<ProductVariantDto>> GetProductVariantsAsync(int shoppingCartId);
 
     }
 }
