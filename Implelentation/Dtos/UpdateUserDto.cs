@@ -4,6 +4,5 @@
     {
         public string PhoneNumber { get; set; }
         public bool Gender { get; set; }
-        public DateOnly DateOfBirth { get; set; }
     }
 }

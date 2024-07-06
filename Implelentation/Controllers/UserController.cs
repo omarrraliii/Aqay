@@ -80,7 +80,6 @@ namespace aqay_apis.Controllers
                 }
                 user.PhoneNumber = updateUserDto.PhoneNumber;
                 user.Gender = updateUserDto.Gender;
-                user.DateOfBirth = updateUserDto.DateOfBirth;
 
                 var result = await _userManager.UpdateAsync(user);
                 if (!result.Succeeded)

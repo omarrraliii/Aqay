@@ -15,18 +15,18 @@ public class ReportsController : ControllerBase
         _adminService = adminService;
     }
     [HttpPost("CreateReport")]
-public async Task<IActionResult> CreateReport([FromBody] ReportDto request)
-{
-    try
+    public async Task<IActionResult> CreateReport([FromBody] ReportDto request)
     {
-        var report = await _reportService.CreateReportAsync(request.Title, request.InitiatorId, request.Description);
-        return CreatedAtAction(nameof(GetReportById), new { id = report.Id }, report);
+        try
+        {
+            var report = await _reportService.CreateReportAsync(request.Title, request.InitiatorId, request.Description);
+            return CreatedAtAction(nameof(GetReportById), new { id = report.Id }, report);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
-    catch (Exception ex)
-    {
-        return BadRequest(new { message = ex.Message });
-    }
-}
     [HttpGet]
     public async Task<IActionResult> GetReports()
     {
@@ -35,7 +35,8 @@ public async Task<IActionResult> CreateReport([FromBody] ReportDto request)
             var reports = await _reportService.GetReportsAsync();
             return Ok(reports);
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }
@@ -51,7 +52,8 @@ public async Task<IActionResult> CreateReport([FromBody] ReportDto request)
             }
             return Ok(report);
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }
@@ -80,7 +82,8 @@ public async Task<IActionResult> CreateReport([FromBody] ReportDto request)
             var reports = await _reportService.GetReportsByStatusAsync(reportStatus);
             return Ok(reports);
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }
@@ -93,7 +96,8 @@ public async Task<IActionResult> CreateReport([FromBody] ReportDto request)
             var report = await _reportService.OpenReportAsync(id, reviewerId);
             return Ok(report);
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }
@@ -110,7 +114,8 @@ public async Task<IActionResult> CreateReport([FromBody] ReportDto request)
             var report = await _reportService.UpdateReportActionAsync(id, action);
             return Ok(report);
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }
@@ -123,7 +128,8 @@ public async Task<IActionResult> CreateReport([FromBody] ReportDto request)
             var report = await _reportService.UpdateReportStatusAsync(id);
             return Ok(report);
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }
@@ -140,7 +146,8 @@ public async Task<IActionResult> CreateReport([FromBody] ReportDto request)
             }
             return NotFound();
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }
