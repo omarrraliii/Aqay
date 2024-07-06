@@ -97,7 +97,10 @@ namespace aqay_apis.Controllers
             try
             {
                 await _authService.ResetPasswordAsync(model.Email, model.OldPassword, model.NewPassword, model.dateOfBirth);
-                return Ok("Password reset successful.");
+                return Ok(new
+                {
+                    Message = "Password reset successful."
+                });
             }
             catch (Exception ex)
             {

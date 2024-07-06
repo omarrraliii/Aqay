@@ -77,6 +77,7 @@ namespace aqay_apis.Services
             var jwtSecurityToken = await CreateJwtToken(user);
             authModel.IsAuthenticated = true;
             authModel.Email = user.Email;
+            authModel.UserId = user.Id;
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
             authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authModel.UserName = user.UserName;
@@ -139,8 +140,8 @@ namespace aqay_apis.Services
             consumer.ShoppingCarts.Add(shoppingCart);
 
             // Create a wishlist for the consumer
-            var wishList = await _wishListService.CreateWishListAsync(consumer);
-            consumer.WishList = wishList;
+            var wishList = await _wishListService.CreateWishListAsync(consumer.Id);
+            consumer.WishListId = wishList.Id;
 
             // Update the shopping cart with the consumer ID
             shoppingCart.ConsumerId = consumer.Id;

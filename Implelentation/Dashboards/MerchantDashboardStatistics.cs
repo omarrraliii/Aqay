@@ -4,7 +4,7 @@
     {
         public double TotalRevenue { get; set; } = 0;
         public double TotalRevenueThisMonth { get; set; } = 0;
-        public List<int> TopProductVariants { get; set; } = new List<int>();
+        public List<TopProductVariant> TopProductVariants { get; set; } = new List<TopProductVariant>();
         public int CompletedOrdersCount { get; set; } = 0;
         public int PendingOrdersCount { get; set; } = 0;
         public List<CategoryStatistics> CategoryStatistics { get; set; } = new List<CategoryStatistics>();

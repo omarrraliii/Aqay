@@ -40,10 +40,6 @@ namespace aqay_apis.Context
             builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
             builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
             builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
-            builder.Entity<Consumer>()
-            .HasOne(c => c.WishList)
-            .WithOne(w => w.Consumer)
-            .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Plan>().HasData(
             new Plan { Id = 1, Name = "Annual subscription", Describtion= "Annual Subscription plan,merchants gain full access to our e - commerce platform for a whole year.", Price = 3600 },

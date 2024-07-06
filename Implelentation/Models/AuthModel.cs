@@ -13,5 +13,6 @@ namespace aqay_apis.Models
         public string Token { get; set; }
         public DateTime ExpiresOn { get; set; }
         public bool isSubscribed { get; set; } = false;
+        public string UserId { get; set; }
     }
 }

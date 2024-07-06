@@ -6,12 +6,10 @@
         public string? LastName { get; set; }
         public string? Address { get; set; }
         public string role { get; set; } = "Consumer";
-
+        public int WishListId { get; set; }
 
         // Relationships
         public ICollection<ShoppingCart> ShoppingCarts { get; set; }
-
-        public WishList WishList { get; set; }
 
     }
 }

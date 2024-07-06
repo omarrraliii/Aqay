@@ -21,13 +21,9 @@ namespace aqay_apis.Dashboards
 
         public async Task<List<double>> GetTotalRevenueForSixMonths(int brandId)
         {
-            // Calculate the start date for 6 months ago from today
             DateTime startDate = DateTime.Today.AddMonths(-6).Date;
-
-            // Initialize a list to store monthly revenues
             List<double> monthlyRevenues = new List<double>();
 
-            // Calculate revenue for each month
             for (int i = 0; i < 6; i++)
             {
                 DateTime monthStart = startDate.AddMonths(i);
@@ -40,10 +36,7 @@ namespace aqay_apis.Dashboards
                 monthlyRevenues.Add(monthlyRevenue);
             }
 
-            // Calculate total revenue for all six months
             double totalRevenue = monthlyRevenues.Sum();
-
-            // Add the total revenue to the list
             monthlyRevenues.Add(totalRevenue);
 
             return monthlyRevenues;
@@ -66,7 +59,7 @@ namespace aqay_apis.Dashboards
             var ordersForTheMonth = orders.Where(o => o.CreatedOn >= firstDayOfMonth).ToList();
             double totalRevenueThisMonth = ordersForTheMonth.Sum(o => o.TotalPrice);
 
-            var topProductVariants = GetTopProductVariants(ordersForTheMonth);
+            var topProductVariants = await GetTopProductVariants(ordersForTheMonth, brandId);
 
             int completedOrdersCount = await GetOrderCountByStatus(brandId, ORDERSTATUSES.DELIVERED);
             int pendingOrdersCount = await GetOrderCountByStatus(brandId, ORDERSTATUSES.PENDING);
@@ -104,21 +97,31 @@ namespace aqay_apis.Dashboards
                 .Where(o => o.BrandId == brandId && o.ORDERSTATUSES == status)
                 .ToListAsync();
         }
-        private List<int> GetTopProductVariants(List<Order> orders)
+
+        private async Task<List<TopProductVariant>> GetTopProductVariants(List<Order> orders, int brandId)
         {
-            return orders
+            var topProductVariants = await _context.Orders
+                .Where(o => o.ORDERSTATUSES == ORDERSTATUSES.DELIVERED && o.BrandId == brandId)
                 .GroupBy(o => o.ProductVariantId)
                 .OrderByDescending(g => g.Count())
                 .Take(5)
-                .Select(g => g.Key)
-                .ToList();
+                .Select(g => new TopProductVariant
+                {
+                    ProductVariantId = g.Key,
+                    OrdersCount = g.Count()
+                })
+                .ToListAsync();
+
+            return topProductVariants;
         }
+
         private async Task<int> GetOrderCountByStatus(int brandId, ORDERSTATUSES status)
         {
             return await _context.Orders
                 .Where(o => o.BrandId == brandId && o.ORDERSTATUSES == status)
                 .CountAsync();
         }
+
         private async Task<List<CategoryStatistics>> GetCategoryStatistics(int brandId, DateTime startDate)
         {
             var ordersCategories = await _context.Orders
@@ -145,6 +148,7 @@ namespace aqay_apis.Dashboards
                 })
                 .ToList();
         }
+
         private async Task<List<ProductRating>> GetProductRatings(int brandId)
         {
             var products = await _context.Products

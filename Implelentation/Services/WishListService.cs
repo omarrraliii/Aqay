@@ -1,87 +1,92 @@
-﻿
-using aqay_apis.Context;
+﻿using aqay_apis.Context;
 using aqay_apis.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace aqay_apis;
-
-public class WishListService : IWishListService
+namespace aqay_apis
 {
-    private ApplicationDbContext _context;
-    public WishListService(ApplicationDbContext context)
+    public class WishListService : IWishListService
     {
-        _context = context;
-    }
-    public async Task<WishList> AddProductToWishList(int id, int productId)
-    {
-        var wishList= await _context.WishLists.Include(w=>w.Products)
-                                        .FirstOrDefaultAsync(w=>w.Id==id);
-        if (wishList == null)
+        private readonly ApplicationDbContext _context;
+
+        public WishListService(ApplicationDbContext context)
         {
-            return null;
-            throw new Exception($"{id} not found");
+            _context = context;
         }
-        var product = await _context.Products.FindAsync(productId);
-        if (product == null)
+
+        public async Task<WishList> AddProductToWishList(int id, int productVariantId)
         {
-            return null;
-            throw new Exception($"{id} not found");
+            var wishList = await _context.WishLists.Include(w => w.ProductsVariants)
+                                                   .FirstOrDefaultAsync(w => w.Id == id);
+            if (wishList == null)
+            {
+                throw new Exception($"Wishlist with ID {id} not found");
+            }
+
+            var productVariant = await _context.ProductVariants.FindAsync(productVariantId);
+            if (productVariant == null)
+            {
+                throw new Exception($"ProductVariant with ID {productVariantId} not found");
+            }
+
+            wishList.ProductsVariants.Add(productVariant);
+            await _context.SaveChangesAsync();
+            return wishList;
         }
-        wishList.Products.Add(product);
-        await _context.SaveChangesAsync();
-        return wishList;
-    }
-    public async Task<WishList> CreateWishListAsync(Consumer consumer)
-    {
-        var wishList=new WishList
+
+        public async Task<WishList> CreateWishListAsync(string consumerId)
         {
-            Consumer=consumer
-        };
-        _context.WishLists.Add(wishList);
-        await _context.SaveChangesAsync();
-        return wishList;
-    }
-    public async Task<bool> DeleteWishListAsync(int id)
-    {
-        var wishList = await _context.WishLists.FindAsync(id);
-        if (wishList == null)
-        {
-            return false;
-            throw new Exception($"{id} was not found.");
+            var wishList = new WishList
+            {
+                ConsumerId = consumerId
+            };
+            _context.WishLists.Add(wishList);
+            await _context.SaveChangesAsync();
+            return wishList;
         }
-        _context.WishLists.Remove(wishList);
-        await _context.SaveChangesAsync();
-        return true;
-    }
-    public async Task<IEnumerable<Product>> GetWishListByIdAsync(string id)
-    {
-        var wishList=await _context.WishLists.Include(w=>w.Products)
-                                            .FirstOrDefaultAsync(w=>w.ConsumerId==id);
-        if (wishList == null)
+
+        public async Task<WishList> RemoveProductFromWishList(int id, int productVariantId)
         {
-            return null;
-            throw new Exception($"{id} was not found.");
+            var wishList = await _context.WishLists.Include(w => w.ProductsVariants)
+                                                   .FirstOrDefaultAsync(w => w.Id == id);
+            if (wishList == null)
+            {
+                throw new Exception($"Wishlist with ID {id} not found");
+            }
+
+            var productVariant = await _context.ProductVariants.FindAsync(productVariantId);
+            if (productVariant == null)
+            {
+                throw new Exception($"ProductVariant with ID {productVariantId} not found");
+            }
+
+            if (!wishList.ProductsVariants.Remove(productVariant))
+            {
+                throw new Exception($"ProductVariant with ID {productVariantId} not in wishlist");
+            }
+
+            await _context.SaveChangesAsync();
+            return wishList;
         }
-        return wishList.Products.OrderByDescending(p=>p.Name)
-                        .ToList();
-    }
-    public async Task<WishList> RemoveProductFromWishList(int id, int productId)
-    {
-        var wishList=await _context.WishLists.Include(w=>w.Products)
-                                                .FirstOrDefaultAsync(w=>w.Id == id);
-        if(wishList==null)
+
+        public async Task<List<ProductVariant>> GetProductVariantsForWishList(int id)
         {
-            return null;
-            throw new Exception ($"{id} was not found");
+            var wishList = await _context.WishLists.Include(w => w.ProductsVariants)
+                                                   .FirstOrDefaultAsync(w => w.Id == id);
+            if (wishList == null)
+            {
+                throw new Exception($"Wishlist with ID {id} not found");
+            }
+
+            return wishList.ProductsVariants.ToList();
         }
-        var product = wishList.Products.FirstOrDefault(p=>p.Id==productId);
-        if (product == null)
+
+        public async Task<int?> GetWishListIdByConsumerIdAsync(string consumerId)
         {
-            return null;
-            throw new Exception ($"product {id} was not found");
+            var wishList = await _context.WishLists
+                                         .FirstOrDefaultAsync(w => w.ConsumerId == consumerId);
+            return wishList?.Id;
         }
-        wishList.Products.Remove(product);
-        await _context.SaveChangesAsync();
-        return wishList;
     }
 }

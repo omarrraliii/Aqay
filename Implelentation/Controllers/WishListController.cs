@@ -1,70 +1,97 @@
 ﻿using aqay_apis.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace aqay_apis.Controllers
 {
-    //[Authorize(Roles = "Consumer,Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class WishListController : ControllerBase
     {
-        private IWishListService _wishListService;
+        private readonly IWishListService _wishListService;
+
         public WishListController(IWishListService wishListService)
         {
             _wishListService = wishListService;
         }
+
         [HttpPost("addProduct")]
-        public async Task<IActionResult> AddProductToWishList(int id, int productId)
+        public async Task<IActionResult> AddProductToWishList([FromQuery] int id, [FromQuery] int productVariantId)
         {
             try
             {
-                var wishList = await _wishListService.AddProductToWishList(id, productId);
-                if (wishList == null)
-                {
-                    return NotFound();
-                }
-                return Ok(wishList);
+                var result = await _wishListService.AddProductToWishList(id, productVariantId);
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateWishList([FromQuery] string consumerId)
+        {
+            try
+            {
+                var result = await _wishListService.CreateWishListAsync(consumerId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpDelete("removeProduct")]
-        public async Task<IActionResult> RemoveProductFromWishList(int id, int productId)
+        public async Task<IActionResult> RemoveProductFromWishList([FromQuery] int id, [FromQuery] int productVariantId)
         {
             try
             {
-                var wishList = await _wishListService.RemoveProductFromWishList(id, productId);
-                if (wishList == null)
-                {
-                    return NotFound();
-                }
-                return Ok(wishList);
+                var result = await _wishListService.RemoveProductFromWishList(id, productVariantId);
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetWishListById(string id)
+
+        [HttpGet("products")]
+        public async Task<IActionResult> GetProductVariantsForWishList([FromQuery] int id)
         {
             try
             {
-                var wishList = await _wishListService.GetWishListByIdAsync(id);
-                if (wishList == null)
-                {
-                    return NotFound($"WishList with Consumer ID {id} not found.");
-                }
-                return Ok(wishList);
+                var result = await _wishListService.GetProductVariantsForWishList(id);
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("getWishListId")]
+        public async Task<IActionResult> GetWishListIdByConsumerId([FromQuery] string consumerId)
+        {
+            try
+            {
+                var result = await _wishListService.GetWishListIdByConsumerIdAsync(consumerId);
+                if (result == null)
+                {
+                    return NotFound(new { message = $"Wishlist for consumer ID {consumerId} not found" });
+                }
+                return Ok(new
+                {
+                    wishlistId = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
     }
 }
-
-

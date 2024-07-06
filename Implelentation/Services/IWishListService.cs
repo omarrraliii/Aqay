@@ -1,12 +1,15 @@
 ﻿using aqay_apis.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace aqay_apis;
-
-public interface IWishListService
+namespace aqay_apis
 {
-    Task<WishList> CreateWishListAsync (Consumer consumer);
-    Task<WishList> AddProductToWishList(int id,int productId);
-    Task<WishList> RemoveProductFromWishList(int id,int productId);
-    Task<IEnumerable<Product>> GetWishListByIdAsync(string id);
-    Task<bool> DeleteWishListAsync (int id);
+    public interface IWishListService
+    {
+        Task<WishList> AddProductToWishList(int id, int productVariantId);
+        Task<WishList> CreateWishListAsync(string consumerId);
+        Task<WishList> RemoveProductFromWishList(int id, int productVariantId);
+        Task<List<ProductVariant>> GetProductVariantsForWishList(int id);
+        Task<int?> GetWishListIdByConsumerIdAsync(string consumerId); // New method
+    }
 }

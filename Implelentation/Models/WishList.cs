@@ -5,9 +5,8 @@ namespace aqay_apis;
 public class WishList
 {
     public int Id { get; set;} 
-    public ICollection<Product>? Products { get; set;}
+    public List<ProductVariant> ProductsVariants { get; set;} = new List<ProductVariant>();
 
     // Relationships
     public string ConsumerId { get; set; }
-    public Consumer Consumer { get; set; }
 }

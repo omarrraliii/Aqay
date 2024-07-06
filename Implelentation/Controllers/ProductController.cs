@@ -51,7 +51,10 @@ namespace aqay_apis.Controllers
             try
             {
                 var productId = await _productService.AddAsync(productDto);
-                return Ok(productId);
+                return Ok(new
+                {
+                    RESULT = productId
+                });
             }
             catch (Exception ex)
             {
