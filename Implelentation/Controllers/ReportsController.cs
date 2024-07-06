@@ -161,7 +161,7 @@ public class ReportsController : ControllerBase
             {
                 return NotFound();
             }
-            return Ok(email);
+            return Ok(new {Email=email});
         }
         catch (Exception ex)
         {
